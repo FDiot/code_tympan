@@ -1,9 +1,11 @@
 """Acoustic Ray Tracer module"""
 from tympan.models import _acousticraytracer as cyAcousticRayTracer
 
+
 class Simulation(object):
     """Main object Simulation for Ray Tracer
     """
+
     def __init__(self):
         """Create an empty simulation"""
         self._simulation = cyAcousticRayTracer.cySimulation()
@@ -52,22 +54,38 @@ class Simulation(object):
         """Get the Scene"""
         self._simulation.getScene()
 
+    def __getattr__(self, name):
+        return getattr(self._simulation, name)
+
 
 class Source(object):
     """Source"""
+
     def __init__(self, x=0, y=0, z=0):
         """Create an empty source"""
         self.cysource = cyAcousticRayTracer.cySource(x, y, z)
 
+    def __getattr__(self, name):
+        return getattr(self.cysource, name)
+
+
 class Recepteur(object):
     """Receptor"""
+
     def __init__(self, x=0, y=0, z=0, r=0):
         """Create an empty receptor"""
         self.cyrecepteur = cyAcousticRayTracer.cyRecepteur(x, y, z, r)
 
+    def __getattr__(self, name):
+        return getattr(self.cyrecepteur, name)
+
 
 class Solver(object):
     """Solver"""
+
     def __init__(self):
         """Create a solver"""
         self.cysolver = cyAcousticRayTracer.cySolver()
+
+    def __getattr__(self, name):
+        return getattr(self.cysolver, name)
