@@ -86,7 +86,7 @@ cdef class cySimulation:
         return scene.getVertices().size()
 
     @property
-    def nvalidrays(self):
+    def nValidRays(self):
         """Number of valid rays found by the simulation"""
         return self.thisptr.get().getSolver().getValidRays().size()
 

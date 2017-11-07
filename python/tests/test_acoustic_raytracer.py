@@ -6,6 +6,7 @@ from tympan.models.acousticraytracer import Simulation, Source, Recepteur, Solve
 
 class TestAcousticRayTracer(TympanTC):
     """Class for AcousticRayTracer tests"""
+
     def test_basic_changing_parameter(self):
         """Test: changing some parameters"""
         simulation = Simulation()
@@ -36,6 +37,28 @@ class TestAcousticRayTracer(TympanTC):
         self.assertEqual(simulation._simulation.getSceneVerticesNumber(), 119)
         with tempfile.NamedTemporaryFile(delete=False) as file:
             simulation.export_scene(file.name)
+
+    def test_complete_running_simulation_with_no_scene(self):
+        simulation = Simulation()
+        config = simulation.configuration()
+        config.setNbRaysPerSource(0)
+        config.setAccelerator(2)
+        config.setKeepDebugRay(True)
+
+        source = Source(5, 0, 0)
+        simulation.add_source(source)
+
+        receptor = Recepteur(15, 0, 0, 3)
+        simulation.add_recepteur(receptor)
+
+        solver = Solver()
+        simulation.set_solver(solver)
+        simulation.post_treatment_scene()
+        simulation.set_accelerator()
+        simulation.set_engine()
+
+        simulation.launch_simulation()
+        self.assertEqual(simulation.nvalid_rays, 1)
 
     def test_complete_running_simulation(self):
         """Test: complete running of a simulation"""
