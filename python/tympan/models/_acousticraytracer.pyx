@@ -33,12 +33,6 @@ cdef class cySimulation:
         """Set the solver"""
         self.thisptr.get().setSolver(s.thisptr)
 
-    def getSolver(self):
-        """Return the solver"""
-        solver = cySolver()
-        solver.thisptr = self.thisptr.get().getSolver()
-        return solver
-
     def getSceneName(self):
         scene = self.thisptr.get().getScene()
         return scene.getName().decode('utf-8')
@@ -65,6 +59,11 @@ cdef class cySimulation:
         '''DefaultEngine by default'''
         self.thisptr.get().setEngine()
 
+    def postTreatmentScene(self):
+        '''Post-process the scene'''
+        self.thisptr.get().getSolver().postTreatmentScene(self.thisptr.get().getScene(),
+                                                          self.thisptr.get().getSources(), self.thisptr.get().getRecepteurs())
+
     def launchSimulation(self):
         """Run the process"""
         return self.thisptr.get().launchSimulation()
@@ -86,14 +85,18 @@ cdef class cySimulation:
         scene = self.thisptr.get().getScene()
         return scene.getVertices().size()
 
+    @property
+    def nvalidrays(self):
+        """Number of valid rays found by the simulation"""
+        return self.thisptr.get().getSolver().getValidRays().size()
+
 cdef class cyRecepteur:
     """Cython class for Receptor"""
     @cy.locals(vec=base_vec3[float])
     def __cinit__(self, x, y, z, r):
         """Create a receptor"""
-        self.thisptr.setRadius(r)
         vec = base_vec3[float](x, y, z)
-        self.thisptr.setPosition(vec)
+        self.thisptr = Recepteur(vec, r)
 
 cdef class cySource:
     """Cython class for Source"""
@@ -136,7 +139,7 @@ cdef class cySolver:
 
     def __cinit__(self):
         """Create a solver"""
-        self.thisptr = new Solver()
+        self.thisptr = new BasicSolver()
 
 cdef class cyAcousticRaytracerConfiguration:
     """Cython class for ray tracer configuration"""

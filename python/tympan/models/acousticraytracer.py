@@ -30,6 +30,9 @@ class Simulation(object):
         """Set the engine (by default, the DefaultEngine one)"""
         self._simulation.setEngine()
 
+    def post_treatment_scene(self):
+        self._simulation.postTreatmentScene()
+
     def launch_simulation(self):
         """Launch the ray tracer process"""
         return self._simulation.launchSimulation()
@@ -53,6 +56,10 @@ class Simulation(object):
     def get_scene(self):
         """Get the Scene"""
         self._simulation.getScene()
+
+    @property
+    def nvalid_rays(self):
+        return self._simulation.nValidRays
 
     def __getattr__(self, name):
         return getattr(self._simulation, name)
