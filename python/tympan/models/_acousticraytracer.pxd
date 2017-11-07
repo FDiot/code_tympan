@@ -127,8 +127,10 @@ cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Acoustic/Solver.h":
         void finish()
         void clean()
         bool loadParameters()
+    cdef cppclass BasicSolver(Solver):
+        BasicSolver()
 cdef class cySolver:
-    cdef Solver * thisptr
+    cdef BasicSolver * thisptr
 
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Acoustic/Spectre.h":
     cdef cppclass Spectre:
@@ -161,7 +163,7 @@ cdef class cySource:
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Acoustic/Recepteur.h":
     cdef cppclass Recepteur(Sphere):
         Recepteur()
-        Recepteur(base_vec3[float] & )
+        Recepteur(base_vec3[float] & pos, float rayon)
 cdef class cyRecepteur:
     cdef Recepteur thisptr
 
