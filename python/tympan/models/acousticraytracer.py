@@ -1,5 +1,6 @@
 """Acoustic Ray Tracer module"""
 from tympan.models import _acousticraytracer as cyAcousticRayTracer
+from tympan.models._common import Point3D
 
 
 class Simulation(object):
@@ -61,16 +62,98 @@ class Simulation(object):
         """Import a Scene from a ply file"""
         self._simulation.import_from_ply(filename)
 
-    def get_scene(self):
-        """Get the Scene"""
-        self._simulation.getScene()
+    @property
+    def valid_rays(self):
+        rays = list()
+        for valid_ray in self._simulation.validRays:
+            r = ray()
+            r.cyray = valid_ray
+            rays.append(r)
+        return rays
 
     @property
     def nvalid_rays(self):
         return self._simulation.nValidRays
 
+    @property
+    def lost_rays(self):
+        rays = list()
+        for lost_ray in self._simulation.lostRays:
+            r = ray()
+            r.cyray = lost_ray
+            rays.append(r)
+        return rays
+
+    def append_triangle_to_scene(self, point1, point2, point3):
+        point1 = Point3D(*point1)
+        point2 = Point3D(*point2)
+        point3 = Point3D(*point3)
+        i1 = self._simulation.add_vertex_to_scene(point1)
+        i2 = self._simulation.add_vertex_to_scene(point2)
+        i3 = self._simulation.add_vertex_to_scene(point3)
+        self._simulation.add_triangle_to_scene(i1, i2, i3)
+
     def __getattr__(self, name):
         return getattr(self._simulation, name)
+
+
+class ray(object):
+
+    def __init__(self):
+        self.cyray = cyAcousticRayTracer.cyRay()
+
+    @property
+    def source(self):
+        s = Source()
+        s.cysource = self.cyray.source
+        return s
+
+    @property
+    def nevents(self):
+        return self.cyray.nevents
+
+    @property
+    def ndiffractions(self):
+        return self.cyray.ndiffractions
+
+    @property
+    def nreflexions(self):
+        return self.cyray.nreflexions
+
+    @property
+    def length(self):
+        return self.cyray.length
+
+    @property
+    def direction(self):
+        return self.cyray.direction
+
+    @property
+    def events(self):
+        l = list()
+        for cyevent in self.cyray.events:
+            e = Event()
+            e.cyevent = cyevent
+            l.append(e)
+        return l
+
+
+class Event(object):
+
+    def __init__(self):
+        self.cyevent = cyAcousticRayTracer.cyEvent()
+
+    @property
+    def type(self):
+        return self.cyevent.type
+
+    @property
+    def position(self):
+        return self.cyevent.position
+
+    @property
+    def incoming_direction(self):
+        return self.cyevent.incoming_direction
 
 
 class Source(object):
