@@ -85,7 +85,7 @@ public :
         if (!acceptGround){
 			
 			//loop on evets
-			std::vector<std::shared_ptr<Event> >* tabEvent = r->getEvents();
+			std::vector<boost::shared_ptr<Event> >* tabEvent = r->getEvents();
 			for(unsigned int i=0;i<tabEvent->size();i++){
 
 				//check if the ith event is a reflexion on the ground
@@ -141,7 +141,7 @@ public :
         if (!acceptGround){
 			
 			//loop on evets
-			std::vector<std::shared_ptr<Event> >* tabEvent = r->getEvents();
+			std::vector<boost::shared_ptr<Event> >* tabEvent = r->getEvents();
 			for(unsigned int i=0;i<tabEvent->size();i++){
 
 				//check if the ith event is a reflexion on the ground
