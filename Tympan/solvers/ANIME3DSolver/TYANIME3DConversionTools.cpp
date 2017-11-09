@@ -64,7 +64,7 @@ void build_event_list_from_Ray(int sens, Ray* ray, acoustic_path& ap)
         ap.getEvents().push_back(e);
 
         //Creation des evenements de diffractions et reflexions
-        std::vector<std::shared_ptr<Event> >::reverse_iterator rit;
+        std::vector<boost::shared_ptr<Event> >::reverse_iterator rit;
 
         for (rit = ray->getEvents()->rbegin(); rit != ray->getEvents()->rend(); rit++)
         {
@@ -89,7 +89,7 @@ void build_event_list_from_Ray(int sens, Ray* ray, acoustic_path& ap)
         ap.getEvents().push_back(e);
 
         //Creation des evenements de diffractions et reflexions
-        std::vector<std::shared_ptr<Event> >::iterator rit;
+        std::vector<boost::shared_ptr<Event> >::iterator rit;
 
         for (rit = ray->getEvents()->begin(); rit != ray->getEvents()->end(); rit++)
         {

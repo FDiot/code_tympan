@@ -68,7 +68,7 @@ void setup_1source_1recepteur(Simulation* simu,
 
 	// Accelerator configuration
 	simu->getScene()->finish(config->Accelerator);   // use the configuration's accelerator
-	simu->get_receptors_landscape()->finish(1);      // use grid accelerator for receptors
+	simu->get_receptors_landscape()->finish(config->Accelerator);      // use grid accelerator for receptors
 
 	// Engine setup (DefaultEngine):
 	simu->setEngine();
@@ -375,14 +375,14 @@ TEST(test_simulation_1source_1recepteur, test_reflexion1)
 	EXPECT_TRUE(ray->direction.compare(dir_right));					//Test ray final direction									
 	EXPECT_EQ(35,ray->getLongueur());								//Test ray length
 
-	std::vector<std::shared_ptr<Event> >* events=ray->getEvents();
+	std::vector<boost::shared_ptr<Event> >* events=ray->getEvents();
 
 	//Test number of events
 	EXPECT_EQ(config->MaxReflexion,ray->getNbEvents());						
 	EXPECT_EQ(config->MaxReflexion,events->size());		 
 
 	//Test events
-	std::shared_ptr<Event> e=events->at(0);
+	boost::shared_ptr<Event> e=events->at(0);
 	EXPECT_EQ(SPECULARREFLEXION,e.get()->getType());					//Test type
 	EXPECT_TRUE(vec3(10,0,0).compare(e.get()->getPosition()));			//Test position
 	EXPECT_TRUE(e.get()->getIncomingDirection().compare(dir_right));	//Test incoming direction
@@ -473,14 +473,14 @@ TEST(test_simulation_1source_1recepteur, test_reflexion2)
 	EXPECT_TRUE(ray->direction.compare(dir_down));	//Test ray final direction									
 	EXPECT_EQ(40,ray->getLongueur());				//Test ray length
 
-	std::vector<std::shared_ptr<Event> >* events=ray->getEvents();
+	std::vector<boost::shared_ptr<Event> >* events=ray->getEvents();
 
 	//Test number of events
 	EXPECT_EQ(3,ray->getNbEvents());						
 	EXPECT_EQ(3,events->size());		 
 
 	//Test events
-	std::shared_ptr<Event> e=events->at(0);
+	boost::shared_ptr<Event> e=events->at(0);
 	EXPECT_EQ(SPECULARREFLEXION,e.get()->getType());					//Test type
 	EXPECT_TRUE(vec3(0,0,0).compare(e.get()->getPosition()));			//Test position
 	EXPECT_TRUE(e.get()->getIncomingDirection().compare(dir_right));	//Test incoming direction
@@ -591,14 +591,14 @@ TEST(test_simulation_1source_1recepteur, test_diffraction)
 	EXPECT_TRUE(ray->direction==dir_down);			//Test ray final direction									
 	EXPECT_EQ(40,ray->getLongueur());				//Test ray length
 
-	std::vector<std::shared_ptr<Event> >* events=ray->getEvents();
+	std::vector<boost::shared_ptr<Event> >* events=ray->getEvents();
 
 	//Test number of events
 	EXPECT_EQ(3,ray->getNbEvents());						
 	EXPECT_EQ(3,events->size());		 
 
 	//Test events
-	std::shared_ptr<Event> e=events->at(0);
+	boost::shared_ptr<Event> e=events->at(0);
 	EXPECT_EQ(SPECULARREFLEXION,e.value->getType());			//Test type
 	EXPECT_TRUE(vec3(0,0,0)==e.value->getPosition());			//Test position
 	EXPECT_TRUE(e.value->getIncomingDirection()==dir_right);	//Test incoming direction
