@@ -14,9 +14,17 @@ class Simulation(object):
         """Add a source (with default sampler)"""
         self._simulation.addSource(source.cysource)
 
+    @property
+    def nsources(self):
+        return self._simulation.getSourcesNumber()
+
     def add_recepteur(self, recepteur):
         """Add a receptor"""
         self._simulation.addRecepteur(recepteur.cyrecepteur)
+
+    @property
+    def nrecepteurs(self):
+        return self._simulation.getReceptorsNumber()
 
     def set_solver(self, solver):
         """Add the solver"""
@@ -72,6 +80,14 @@ class Source(object):
         """Create an empty source"""
         self.cysource = cyAcousticRayTracer.cySource(x, y, z)
 
+    @property
+    def position(self):
+        return self.cysource.position
+
+    @property
+    def nrays_left(self):
+        return self.cysource.nbRayLeft()
+
     def __getattr__(self, name):
         return getattr(self.cysource, name)
 
@@ -82,6 +98,10 @@ class Recepteur(object):
     def __init__(self, x=0, y=0, z=0, r=0):
         """Create an empty receptor"""
         self.cyrecepteur = cyAcousticRayTracer.cyRecepteur(x, y, z, r)
+
+    @property
+    def position(self):
+        return self.cyrecepteur.position
 
     def __getattr__(self, name):
         return getattr(self.cyrecepteur, name)

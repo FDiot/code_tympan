@@ -22,11 +22,19 @@ cdef class cySimulation:
         source = s.thisptr
         self.thisptr.get().addSource(source)
 
+    def getSourcesNumber(self):
+        """Get the sources number"""
+        return self.thisptr.get().getSources().size()
+
     @cy.locals(r=cyRecepteur, receptor=Recepteur)
     def addRecepteur(self, r):
         """Add a receptor"""
         receptor = r.thisptr
         self.thisptr.get().addRecepteur(receptor)
+
+    def getReceptorsNumber(self):
+        """Get the receptors number"""
+        return self.thisptr.get().getRecepteurs().size()
 
     @cy.locals(s=cySolver)
     def setSolver(self, s):
@@ -76,10 +84,6 @@ cdef class cySimulation:
         """Get the ray tracer configuration"""
         return self.configuration
 
-    def getSourcesNumber(self):
-        """Get the sources number"""
-        return self.thisptr.get().getSources().size()
-
     def getSceneVerticesNumber(self):
         """Get the number of Scene vertices"""
         scene = self.thisptr.get().getScene()
@@ -98,6 +102,14 @@ cdef class cyRecepteur:
         vec = base_vec3[float](x, y, z)
         self.thisptr = Recepteur(vec, r)
 
+    @property
+    def position(self):
+        position = self.thisptr.getPosition()
+        x = position.get_x()
+        y = position.get_y()
+        z = position.get_z()
+        return (x, y, z)
+
 cdef class cySource:
     """Cython class for Source"""
     SamplerList = ['RandomSphericSampler', 'UniformSphericSampler',
@@ -107,6 +119,18 @@ cdef class cySource:
         """Create a source"""
         vec = new base_vec3[float](x, y, z)
         self.thisptr.setPosition(vec)
+
+    @property
+    def position(self):
+        position = self.thisptr.getPosition()
+        x = position.get_x()
+        y = position.get_y()
+        z = position.get_z()
+        return (x, y, z)
+
+    @property
+    def nbRaysLeft(self):
+        return self.thisptr.getNbRayLeft()
 
     def setSampler(self, SamplerID, nbRaysPerSource):
         """Change the Source Sampler"""
