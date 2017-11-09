@@ -1,6 +1,8 @@
 """solver models for Code_TYMPAN, headers
 """
 import cython as cy
+from cython.operator cimport dereference as deref
+from tympan.models cimport _common as tycommon
 
 cdef class cySimulation:
     """Simulation Cython class"""
@@ -40,6 +42,18 @@ cdef class cySimulation:
     def setSolver(self, s):
         """Set the solver"""
         self.thisptr.get().setSolver(s.thisptr)
+
+    @cy.locals(point=tycommon.Point3D)
+    def add_vertex_to_scene(self, point):
+        cpp_vertex = cy.declare(base_vec3[float],
+                                base_vec3[float](point.x, point.y, point.z))
+        cdef unsigned int index
+        self.thisptr.get().getScene().addVertex(cpp_vertex, index)
+        return index
+
+    def add_triangle_to_scene(self, idx1, idx2, idx3):
+        mat = new Material()
+        self.thisptr.get().getScene().addTriangle(idx1, idx2, idx3, mat, False)
 
     def getSceneName(self):
         scene = self.thisptr.get().getScene()
@@ -93,6 +107,108 @@ cdef class cySimulation:
     def nValidRays(self):
         """Number of valid rays found by the simulation"""
         return self.thisptr.get().getSolver().getValidRays().size()
+
+    @property
+    def validRays(self):
+        crays_pointer = cy.declare(cy.pointer(deque[cy.pointer(Ray)]),
+                                   self.thisptr.get().getSolver().getValidRays())
+        crays = cy.declare(deque[cy.pointer(Ray)], deref(crays_pointer))
+        cray = cy.declare(cy.pointer(Ray))
+        rays_list = list()
+        for cray in crays:
+            cyray = cyRay()
+            cyray.thisptr = cray
+            rays_list.append(cyray)
+        return rays_list
+
+    @property
+    def lostRays(self):
+        crays_pointer = cy.declare(cy.pointer(deque[cy.pointer(Ray)]),
+                                   self.thisptr.get().getSolver().getDebugRays())
+        crays = cy.declare(deque[cy.pointer(Ray)], deref(crays_pointer))
+        cray = cy.declare(cy.pointer(Ray))
+        rays_list = list()
+        for cray in crays:
+            cyray = cyRay()
+            cyray.thisptr = cray
+            rays_list.append(cyray)
+        return rays_list
+
+cdef class cyRay:
+    def __cinit__(self):
+        self.thisptr = new Ray()
+
+    @property
+    def source(self):
+        source = cySource(0, 0, 0)
+        source.thisptr = deref(self.thisptr.getSource())
+        return source
+
+    @property
+    def nevents(self):
+        return self.thisptr.getNbEvents()
+
+    @property
+    def ndiffractions(self):
+        return self.thisptr.getDiff()
+
+    @property
+    def nreflexions(self):
+        return self.thisptr.getReflex()
+
+    @property
+    def length(self):
+        self.thisptr.computeLongueur()
+        return self.thisptr.getLongueur()
+
+    @property
+    def direction(self):
+        cdirection = cy.declare(base_vec3[float], self.thisptr.getDirection())
+        x = cdirection.get_x()
+        y = cdirection.get_y()
+        z = cdirection.get_z()
+        return (x, y, z)
+
+    @property
+    def events(self):
+        cevents_ptr = cy.declare(cy.pointer(vector[shared_ptr[Event]]),
+                                 self.thisptr.getEvents())
+        cevents = cy.declare(vector[shared_ptr[Event]], deref(cevents_ptr))
+        cevent = cy.declare(shared_ptr[Event])
+        events_list = list()
+        for cevent in cevents:
+            event = cyEvent()
+            event.thisptr = cevent.get()
+            events_list.append(event)
+        return events_list
+
+cdef class cyEvent:
+    TYPE_EVENT = {0: 'SPECULAR REFLEXION',
+                  1: 'DIFFRACTION',
+                  2: 'NOTHING'}
+
+    def __cinit__(self):
+        self.thisptr = new Event()
+
+    @property
+    def type(self):
+        return self.TYPE_EVENT[self.thisptr.getType()]
+
+    @property
+    def position(self):
+        position = self.thisptr.getPosition()
+        x = position.get_x()
+        y = position.get_y()
+        z = position.get_z()
+        return (x, y, z)
+
+    @property
+    def incoming_direction(self):
+        direction = self.thisptr.getIncomingDirection()
+        x = direction.get_x()
+        y = direction.get_y()
+        z = direction.get_z()
+        return (x, y, z)
 
 cdef class cyRecepteur:
     """Cython class for Receptor"""
