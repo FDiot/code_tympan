@@ -4,56 +4,62 @@ from libcpp cimport bool
 from libcpp.string cimport string
 from libcpp.deque cimport deque
 from libcpp.vector cimport vector
-from libcpp.list cimport list
-
-cdef extern from "boost/shared_ptr.hpp" namespace "boost":
-    cdef cppclass shared_ptr[T]:
-        shared_ptr(T*)
-        shared_ptr()
-        T *get()
+from libcpp.list cimport list as clist
+from tympan._core cimport shared_ptr
 
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Geometry/mathlib.h":
     cdef cppclass base_vec3[T]:
         base_vec3()
-        base_vec3(T,T,T)
+        base_vec3(T, T, T)
+        T get_x()
+        T get_y()
+        T get_z()
+
 
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Base.h":
     cdef cppclass Base:
         string getName()
-        void setName(const string &_name)
+        void setName(const string & _name)
 
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Accelerator/LeafTreatment.h" namespace "leafTreatment":
     cdef enum treatment "leafTreatment::treatment":
-        FIRST          
+        FIRST
         ALL_BEFORE_TRIANGLE
         ALL_BEFORE_VISIBLE
         ALL
 
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Acoustic/Event.h":
     cdef cppclass Event(Base):
-        pass
+        int getType()
+        base_vec3[float] getPosition()
+        base_vec3[float] getIncomingDirection()
+
     cdef enum typeevent:
         SPECULARREFLEXION
         DIFFRACTION
         NOTHING
-                
+
+
+cdef class cyEvent:
+    cdef Event * thisptr
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Geometry/Shape.h":
     cdef cppclass Shape(Base):
         pass
     cdef struct Intersection:
         pass
-    
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Geometry/Sphere.h":
     cdef cppclass Sphere(Shape):
         void setRadius(float)
-        void setPosition(base_vec3[float]&)
+        void setPosition(base_vec3[float] & )
 
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Geometry/Sampler.h":
     cdef cppclass Sampler:
         Sampler()
-cdef class cySampler:        
-    cdef Sampler* thisptr
-    
+cdef class cySampler:
+    cdef Sampler * thisptr
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Geometry/Latitude2DSampler.h":
     cdef cppclass Latitude2DSampler(Sampler):
         Latitude2DSampler(int)
@@ -82,62 +88,68 @@ cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Geometry/UniformSph
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Engine/Engine.h":
     cdef cppclass Engine:
         Engine()
-        Scene* getScene()
-        void setScene(Scene*)
-        Solver* getSolver()
-        void setSolver(Solver*)
-        
+        Scene * getScene()
+        void setScene(Scene * )
+        Solver * getSolver()
+        void setSolver(Solver * )
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Engine/DefaultEngine.h":
     cdef cppclass DefaultEngine(Engine):
         pass
-    
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Engine/ParallelDefaultEngine.h":
     cdef cppclass ParallelDefaultEngine(Engine):
         pass
-    
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Ray/Ray.h":
     cdef cppclass Ray(Base):
         float computeEventsSequenceLength()
         void computeLongueur()
-        float computeTrueLength (base_vec3[float]&, base_vec3[float]&, base_vec3[float]&)
-        float computePertinentLength (base_vec3[float]&, base_vec3[float]&, base_vec3[float]&)
-        Base* getLastPertinentEventOrSource(typeevent)   
-        base_vec3[float] computeLocalOrigin(Base*)
-        double getLongueur() 
+        float computeTrueLength (base_vec3[float] & , base_vec3[float]&, base_vec3[float]&)
+        float computePertinentLength (base_vec3[float] & , base_vec3[float]&, base_vec3[float]&)
+        Base * getLastPertinentEventOrSource(typeevent)
+        base_vec3[float] computeLocalOrigin(Base * )
+        double getLongueur()
+        base_vec3[float] getDirection()
         int getDiff()
         int getReflex()
         int getNbEvents()
-        vector[shared_ptr[Event]]* getEvents()
+        vector[shared_ptr[Event]] * getEvents()
         vector[int] getFaceHistory()
         vector[int] getPrimitiveHistory()
-        Source* getSource()
-        void* getRecepteur()
-        float getThickness(float&, bool)
-        float getSolidAngle(bool&)
-    
+        Source * getSource()
+        void * getRecepteur()
+        float getThickness(float & , bool)
+        float getSolidAngle(bool & )
+
+cdef class cyRay:
+    cdef Ray * thisptr
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Acoustic/Solver.h":
     cdef cppclass Solver:
         Solver()
-        bool postTreatmentScene(Scene*, vector[Source]&, vector[Recepteur]&)
-        bool valideIntersection(Ray*, Intersection*)
-        bool valideRayon(Ray*)
-        bool invalidRayon(Ray*)
-        deque[Ray*]* getValidRays()
-        deque[Ray*]* getDebugRays()
+        bool postTreatmentScene(Scene * , vector[Source]&, vector[Recepteur]&)
+        bool valideIntersection(Ray * , Intersection*)
+        bool valideRayon(Ray * )
+        bool invalidRayon(Ray * )
+        deque[Ray *] * getValidRays()
+        deque[Ray *] * getDebugRays()
         void finish()
         void clean()
-        bool loadParameters()  
-cdef class cySolver:        
-    cdef Solver* thisptr
+        bool loadParameters()
+    cdef cppclass BasicSolver(Solver):
+        BasicSolver()
+cdef class cySolver:
+    cdef BasicSolver * thisptr
 
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Acoustic/Spectre.h":
     cdef cppclass Spectre:
         Spectre()
         int getSizeSpectre()
-        void getFrequencies(vector[int]&)
+        void getFrequencies(vector[int] & )
         int getFrequencie(int)
-        void getPowers(vector[float]&)
-        void getPowers(float*)
+        void getPowers(vector[float] & )
+        void getPowers(float * )
         float getPower(int)
         void addFrequencie(int, float)
 
@@ -147,21 +159,23 @@ cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Acoustic/Source.h":
         base_vec3[float] getPosition()
         void setPosition(base_vec3[float])
         Spectre getSpectre()
-        void setSpectre(Spectre&)
-        Sampler* getSampler()
-        void setSampler(Sampler*)
+        void setSpectre(Spectre & )
+        Sampler * getSampler()
+        void setSampler(Sampler * )
         int getId()
         void setId(int)
-        bool getDirection(base_vec3[float]&)
+        bool getDirection(base_vec3[float] & )
         void setInitialRayCount(int)
-        void setPosition(base_vec3[float]*)
+        void setPosition(base_vec3[float] * )
+        int getNbRayLeft()
 cdef class cySource:
     cdef Source thisptr
 
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Acoustic/Recepteur.h":
     cdef cppclass Recepteur(Sphere):
         Recepteur()
-        Recepteur(base_vec3[float]&)
+        Recepteur(base_vec3[float] & pos, float rayon)
+        base_vec3[float] getPosition()
 cdef class cyRecepteur:
     cdef Recepteur thisptr
 
@@ -170,9 +184,9 @@ cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Accelerator/Acceler
         Accelerator()
         bool build()
         treatment getIntersectionChoice()
-        void setIntersectionChoice (treatment)
-        float traverse(Ray*, list[Intersection]&)
-    
+        void setIntersectionChoice(treatment)
+        float traverse(Ray * , clist[Intersection]&)
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Accelerator/BruteForceAccelerator.h":
     cdef cppclass BruteForceAccelerator(Accelerator):
         pass
@@ -191,45 +205,49 @@ cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Accelerator/KdtreeA
 
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Acoustic/Material.h":
     cdef cppclass Material(Base):
-        pass
+        Material()
 
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Geometry/BBox.h":
     cdef cppclass BBox:
         pass
-    
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Geometry/Scene.h":
     cdef cppclass Scene(Base):
+        Scene()
         void clean()
-        void addShape(Shape*)
+        void addShape(Shape * )
         BBox getGlobalBox()
-        Accelerator* getAccelerator()
-        vector[base_vec3]* getVertices()
-        bool addVertex(base_vec3[float]&, int)
-        Shape* addTriangle(int, int, int, Material*, bool)
-        void addBuilding (base_vec3[float], base_vec3[float], Material*)
+        Accelerator * getAccelerator()
+        vector[base_vec3] * getVertices()
+        bool addVertex(base_vec3[float] &, unsigned int & )
+        Shape * addTriangle(int, int, int, Material *, bool)
+        void addBuilding (base_vec3[float], base_vec3[float], Material * )
         bool finish(int accelerator_id, treatment _intersectionChoice)
         void export_to_ply(string)
         void import_from_ply(string)
-                    
+
+cdef class cyScene:
+    cdef Scene * thisptr
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Engine/Simulation.h":
     cdef cppclass Simulation(Base):
         Simulation()
-        AcousticRaytracerConfiguration* getConfiguration()
-        Scene* getScene()
-        Scene* get_receptors_landscape()
-        void addSource(const Source& s) 
-        vector[Source]& getSources()    
-        void addRecepteur(const Recepteur& r)
-        vector[Recepteur]& getRecepteurs()    
-        void setSolver(Solver*)
-        Solver* getSolver()
+        AcousticRaytracerConfiguration * getConfiguration()
+        Scene * getScene()
+        Scene * get_receptors_landscape()
+        void addSource(const Source & s)
+        vector[Source] & getSources()
+        void addRecepteur(const Recepteur & r)
+        vector[Recepteur] & getRecepteurs()
+        void setSolver(Solver * )
+        Solver * getSolver()
         void setEngine()
-        bool launchSimulation()    
+        bool launchSimulation()
         void clean()
 cdef class cySimulation:
     cdef shared_ptr[Simulation] thisptr
     cdef cyAcousticRaytracerConfiguration configuration
-        
+
 cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Engine/AcousticRaytracerConfiguration.h":
     cdef cppclass AcousticRaytracerConfiguration:
         unsigned int NbRaysPerSource
@@ -255,13 +273,13 @@ cdef extern from "Tympan/geometric_methods/AcousticRaytracer/Engine/AcousticRayt
         bool DiffractionUseDistanceAsFilter
         bool DiffractionUseRandomSampler
         bool DiffractionDropDownNbRays
-        bool UsePostFilter
-        bool DebugUseCloseEventPostFilter
+        bool UsePostFilters
+        bool DebugUseCloseEventSelector
         bool DebugUseDiffractionAngleSelector
         bool DebugUseDiffractionPathSelector
         bool DebugUseFermatSelector
         bool DebugUseFaceSelector
         bool KeepDebugRay
-        
+
 cdef class cyAcousticRaytracerConfiguration:
-    cdef AcousticRaytracerConfiguration* thisptr        
+    cdef AcousticRaytracerConfiguration * thisptr
