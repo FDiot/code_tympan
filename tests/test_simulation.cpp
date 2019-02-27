@@ -514,7 +514,7 @@ TEST(test_simulation_1source_1recepteur, test_diffraction)
 
 	AcousticRaytracerConfiguration* ray_tracer_config = simu.getConfiguration();
 	ray_tracer_config->NbRayWithDiffraction=50;
-	ray_tracer_config->UsePostFilter=false;
+	ray_tracer_config->UsePostFilters=false;
 	ray_tracer_config->UsePathDifValidation=false;
 	ray_tracer_config->DiffractionFilterRayAtCreation=false;
 

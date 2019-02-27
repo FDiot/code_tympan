@@ -106,20 +106,20 @@ bool BasicSolver::postTreatmentScene(Scene* scene, std::vector<Source>& sources,
 
 bool BasicSolver::valideIntersection(Ray* r, Intersection* inter)
 {
-    if (r->events.size() > static_cast<unsigned int>(AcousticRaytracerConfiguration::get()->MaxProfondeur)) { return false; }
+    if (r->getNbEvents() > static_cast<unsigned int>(AcousticRaytracerConfiguration::get()->MaxProfondeur)) { return false; }
 
     bool isValid = false;
 
     // cas d'un triangle (sol)
     if ( ( inter->forme == TRIANGLE ) &&
-         ( r->nbReflexion < static_cast<unsigned int>(AcousticRaytracerConfiguration::get()->MaxReflexion) ) &&
+         ( r->getReflex() < static_cast<unsigned int>(AcousticRaytracerConfiguration::get()->MaxReflexion) ) &&
          !( !AcousticRaytracerConfiguration::get()->UseSol && inter->p->isSol() ) )
     {
         isValid = ValidRay::validTriangleWithSpecularReflexion(r, inter);
     }
 
     // cas du cylindre (arrete de diffraction)
-    else if (inter->forme == CYLINDRE && r->nbDiffraction < static_cast<unsigned int>(AcousticRaytracerConfiguration::get()->MaxDiffraction))
+    else if (inter->forme == CYLINDRE && r->getDiff() < static_cast<unsigned int>(AcousticRaytracerConfiguration::get()->MaxDiffraction))
     {
         isValid = ValidRay::validCylindreWithDiffraction(r, inter);
     }

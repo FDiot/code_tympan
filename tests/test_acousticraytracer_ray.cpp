@@ -44,7 +44,7 @@ TEST(test_ray, compute_event_sequence_length)
     // add one event
     Event* ev0 = new Event();
     ev0->setPosition(vec3(10, 0, 0));
-    std::shared_ptr<Event> SPE0(ev0);
+    boost::shared_ptr<Event> SPE0(ev0);
     ray->getEvents()->push_back(SPE0);
 
     //1 event => length = 0
@@ -54,7 +54,7 @@ TEST(test_ray, compute_event_sequence_length)
     // add a second event
     Event* ev1 = new Event();
     ev1->setPosition(vec3(20, 0, 10));
-    std::shared_ptr<Event> SPE1(ev1);
+    boost::shared_ptr<Event> SPE1(ev1);
     ray->getEvents()->push_back(SPE1);
 
     //2 events => length = dist(ev0,ev1)
@@ -65,7 +65,7 @@ TEST(test_ray, compute_event_sequence_length)
     // add a third event
     Event* ev2 = new Event();
     ev2->setPosition(vec3(25, 0, 7));
-    std::shared_ptr<Event> SPE2(ev2);
+    boost::shared_ptr<Event> SPE2(ev2);
     ray->getEvents()->push_back(SPE2);
 
     //3 events => length = dist(ev0,ev1) + dist(ev1,ev2)
@@ -76,7 +76,7 @@ TEST(test_ray, compute_event_sequence_length)
     // add a fourth event
     Event* ev3 = new Event();
     ev3->setPosition(vec3(50, 0, 3));
-    std::shared_ptr<Event> SPE3(ev3);
+    boost::shared_ptr<Event> SPE3(ev3);
     ray->getEvents()->push_back(SPE3);
 
     //4 events => length = dist(ev0,ev1) + dist(ev1,ev2) + dist(ev2,ev3)
@@ -113,7 +113,7 @@ TEST(test_ray, compute_length)
     // Add one event
     Event* ev0 = new Event();
     ev0->setPosition(vec3(10, 0, 0));
-    std::shared_ptr<Event> SPE0(ev0);
+    boost::shared_ptr<Event> SPE0(ev0);
     ray->getEvents()->push_back(SPE0);
 
     //remove the receptor from the ray
@@ -138,7 +138,7 @@ TEST(test_ray, compute_length)
     // add a second event 
     Event* ev1 = new Event();
     ev1->setPosition(vec3(20, 0, 10));
-    std::shared_ptr<Event> SPE1(ev1);
+    boost::shared_ptr<Event> SPE1(ev1);
     ray->getEvents()->push_back(SPE1);
 
     ray->computeLongueur();
@@ -179,7 +179,7 @@ TEST(test_ray, compute_true_length)
     // Add one event
     Event* ev0 = new Event();
     ev0->setPosition(vec3(10, 0, 20));
-    std::shared_ptr<Event> SPE0(ev0);
+    boost::shared_ptr<Event> SPE0(ev0);
     ray->getEvents()->push_back(SPE0);
 
     true_length=ray->computeTrueLength(vec3(15,0,10),rcpt->getPosition(),closestPoint);
@@ -196,7 +196,7 @@ TEST(test_ray, compute_true_length)
      // add a second event 
     Event* ev1 = new Event();
     ev1->setPosition(vec3(20, 0, 10));
-    std::shared_ptr<Event> SPE1(ev1);
+    boost::shared_ptr<Event> SPE1(ev1);
     ray->getEvents()->push_back(SPE1);
 
     true_length=ray->computeTrueLength(vec3(25,5,0),rcpt->getPosition(),closestPoint);
@@ -226,17 +226,17 @@ TEST(test_ray, get_last_pertinent_event_or_source)
     // Add several events with different types
     Event* e1=new Event();
     e1->setType(SPECULARREFLEXION);
-    std::shared_ptr<Event> SPE1(e1);
+    boost::shared_ptr<Event> SPE1(e1);
     r->getEvents()->push_back(SPE1);
 
     Event* e2=new Event();
     e2->setType(DIFFRACTION);
-    std::shared_ptr<Event> SPE2(e2);
+    boost::shared_ptr<Event> SPE2(e2);
     r->getEvents()->push_back(SPE2);
 
     SpecularReflexion* e3=new SpecularReflexion();
     e3->setType(SPECULARREFLEXION);
-    std::shared_ptr<Event> SPE3(e3);
+    boost::shared_ptr<Event> SPE3(e3);
     r->getEvents()->push_back(SPE3);
 
     res=r->getLastPertinentEventOrSource(); //pertinent event type is DIFFRACTION by default
@@ -273,7 +273,7 @@ TEST(test_ray, compute_pertinent_length)
     Event* ev0 = new Event();
     ev0->setPosition(vec3(10, 0, 20));
     ev0->setType(SPECULARREFLEXION);
-    std::shared_ptr<Event> SPE0(ev0);
+    boost::shared_ptr<Event> SPE0(ev0);
     ray->getEvents()->push_back(SPE0);
 
 
@@ -289,7 +289,7 @@ TEST(test_ray, compute_pertinent_length)
     Event* ev1 = new Event();
     ev1->setPosition(vec3(20, 0, 10));
     ev1->setType(DIFFRACTION);
-    std::shared_ptr<Event> SPE1(ev1);
+    boost::shared_ptr<Event> SPE1(ev1);
     ray->getEvents()->push_back(SPE1);
 
     pertinent_length=ray->computePertinentLength(vec3(25,5,0),rcpt->getPosition(),closestPoint);
@@ -306,7 +306,7 @@ TEST(test_ray, compute_pertinent_length)
     Event* ev2 = new Event();
     ev2->setPosition(vec3(26, 8, 8));
     ev2->setType(SPECULARREFLEXION);
-    std::shared_ptr<Event> SPE2(ev2);
+    boost::shared_ptr<Event> SPE2(ev2);
     ray->getEvents()->push_back(SPE2);
 
     pertinent_length=ray->computePertinentLength(vec3(28,6,2),rcpt->getPosition(),closestPoint);
@@ -345,19 +345,19 @@ TEST(test_ray, get_face_history)
     // add one event
     Event* ev0 = new Event();
     ev0->setShape(shape1);
-    std::shared_ptr<Event> SPE0(ev0);
+    boost::shared_ptr<Event> SPE0(ev0);
     ray->getEvents()->push_back(SPE0);
 
     // add a second event
     Event* ev1 = new Event();
     ev1->setShape(shape2);
-    std::shared_ptr<Event> SPE1(ev1);
+    boost::shared_ptr<Event> SPE1(ev1);
     ray->getEvents()->push_back(SPE1);
 
     // add a third event
     Event* ev2 = new Event();
     ev2->setShape(shape3);
-    std::shared_ptr<Event> SPE2(ev2);
+    boost::shared_ptr<Event> SPE2(ev2);
     ray->getEvents()->push_back(SPE2);
 
 
@@ -397,19 +397,19 @@ TEST(test_ray, get_primitivee_history)
     // add one event
     Event* ev0 = new Event();
     ev0->setShape(shape1);
-    std::shared_ptr<Event> SPE0(ev0);
+    boost::shared_ptr<Event> SPE0(ev0);
     ray->getEvents()->push_back(SPE0);
 
     // add a second event
     Event* ev1 = new Event();
     ev1->setShape(shape2);
-    std::shared_ptr<Event> SPE1(ev1);
+    boost::shared_ptr<Event> SPE1(ev1);
     ray->getEvents()->push_back(SPE1);
 
     // add a third event
     Event* ev2 = new Event();
     ev2->setShape(shape3);
-    std::shared_ptr<Event> SPE2(ev2);
+    boost::shared_ptr<Event> SPE2(ev2);
     ray->getEvents()->push_back(SPE2);
 
 
@@ -460,7 +460,7 @@ TEST(test_ray, get_solid_angle)
     // add a diffraction event
     Diffraction* ev0 = new Diffraction(vec3(0,0,0),vec3(0,1,0),cylindre);
 
-    std::shared_ptr<Event> SPE0(ev0);
+    boost::shared_ptr<Event> SPE0(ev0);
     ray->getEvents()->push_back(SPE0);
 
     diffraction=true;
@@ -515,7 +515,7 @@ TEST(test_ray, get_thickness)
     // add a diffraction event
     Diffraction* ev0 = new Diffraction(vec3(0,0,0),vec3(0,1,0),cylindre);
 
-    std::shared_ptr<Event> SPE0(ev0);
+    boost::shared_ptr<Event> SPE0(ev0);
     ray->getEvents()->push_back(SPE0);
 
     diffraction=true;
@@ -548,22 +548,22 @@ TEST(test_ray, signature)
     // Add several events with different types
     Event* ev0 = new Event();
     ev0->setType(SPECULARREFLEXION);
-    std::shared_ptr<Event> SPE0(ev0);
+    boost::shared_ptr<Event> SPE0(ev0);
     ray->getEvents()->push_back(SPE0);
 
     Event* ev1 = new Event();
     ev1->setType(DIFFRACTION);
-    std::shared_ptr<Event> SPE1(ev1);
+    boost::shared_ptr<Event> SPE1(ev1);
     ray->getEvents()->push_back(SPE1);
 
     Event* ev2 = new Event();
     ev2->setType(DIFFRACTION);
-    std::shared_ptr<Event> SPE2(ev2);
+    boost::shared_ptr<Event> SPE2(ev2);
     ray->getEvents()->push_back(SPE2);
 
     Event* ev3 = new Event();
     ev3->setType(SPECULARREFLEXION);
-    std::shared_ptr<Event> SPE3(ev3);
+    boost::shared_ptr<Event> SPE3(ev3);
     ray->getEvents()->push_back(SPE3);
 
     signature sig = ray->getSignature();

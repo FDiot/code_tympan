@@ -408,7 +408,7 @@ TEST(test_valid_ray,compute_cumul_distance){
     Event* e=new Event();
     e->setType(SPECULARREFLEXION);
 	e->setPosition(vec3((decimal)-7.5,(decimal)8.6,(decimal)-12.41));
-    std::shared_ptr<Event> SPE(e);
+    boost::shared_ptr<Event> SPE(e);
     ray->getEvents()->push_back(SPE);
 
     ValidRay::computeCumulDistance(ray,impact);
@@ -538,7 +538,7 @@ TEST(test_valid_ray,is_ray_passes_near_ridge){
 	vec3 from=vec3(10,-5,7);
     from.normalize();
 	Diffraction* diff=new Diffraction(vec3(10,-5,7),&from,&cylindre);
-	std::shared_ptr<Event> SPE(diff);
+	boost::shared_ptr<Event> SPE(diff);
 	ray.getEvents()->push_back(SPE);
 
 	vec3 impact(vec3(20,-10,14));
@@ -564,7 +564,7 @@ TEST(test_valid_ray,path_diff_validation_for_reflection){
 	 // Add several events with different types
 	SpecularReflexion* reflection = new SpecularReflexion();
 	reflection->setPosition(vec3(-8,12,-4));
-    std::shared_ptr<Event> SPE(reflection);
+    boost::shared_ptr<Event> SPE(reflection);
     ray->getEvents()->push_back(SPE);
 
 	//init cumulDistance
@@ -619,7 +619,7 @@ TEST(test_valid_ray,path_diff_validation_for_diffraction){
 	//Add several events with different types
 	SpecularReflexion* reflection = new SpecularReflexion();
 	reflection->setPosition(vec3(-8,12,-4));
-    std::shared_ptr<Event> SPE(reflection);
+    boost::shared_ptr<Event> SPE(reflection);
     ray->getEvents()->push_back(SPE);
 
 	//Set maxPathDiffrence 
@@ -660,11 +660,11 @@ TEST(test_valid_ray,path_diff_validation){
 	//Create two events
 	SpecularReflexion* reflection1 = new SpecularReflexion();
 	reflection1->setPosition(vec3(-8,12,-4));
-    std::shared_ptr<Event> SPE1(reflection1);
+    boost::shared_ptr<Event> SPE1(reflection1);
   
 	Diffraction* diffraction= new Diffraction();
 	diffraction->setPosition(vec3(-8,2,-4));
-    std::shared_ptr<Event> SPE2(diffraction);
+    boost::shared_ptr<Event> SPE2(diffraction);
  
   
 	//Set maxPathDiffrence 

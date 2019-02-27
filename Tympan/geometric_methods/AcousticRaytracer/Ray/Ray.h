@@ -114,9 +114,6 @@ public:
      * \param closestPoint
      */
 	decimal computeTrueLength(const vec3& ref, const vec3& lastPos, vec3& closestPoint);
-
-    vec3 getDirection() const {return direction;}
-
     /*!
      * \fn decimal computePertinentLength(const vec3& ref, const vec3& lastPos, vec3& closestPoint);
      * \brief Compute ray length from last pertinent event (i.e. source or last diffraction)
@@ -433,7 +430,7 @@ public:
      * \brief set the cumulative walking step difference by the ray computed at each step
      */
 
-     void addEvent (std::shared_ptr<Event> _event){
+     void addEvent (boost::shared_ptr<Event> _event){
         events.push_back(_event);
      }
  
