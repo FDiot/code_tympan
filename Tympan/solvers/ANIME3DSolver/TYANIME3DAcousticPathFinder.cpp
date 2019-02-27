@@ -435,8 +435,8 @@ void TYANIME3DAcousticPathFinder::configure_raytracer()
     raytracer_config->DiffractionUseDistanceAsFilter = solver_config->DiffractionUseDistanceAsFilter;
     raytracer_config->DiffractionUseRandomSampler = solver_config->DiffractionUseRandomSampler;
     raytracer_config->DiffractionDropDownNbRays = solver_config->DiffractionDropDownNbRays;
-    raytracer_config->UsePostFilter = solver_config->UsePostFilters;
-    raytracer_config->DebugUseCloseEventPostFilter = solver_config->DebugUseCloseEventSelector;
+    raytracer_config->UsePostFilters = solver_config->UsePostFilters;
+    raytracer_config->DebugUseCloseEventSelector = solver_config->DebugUseCloseEventSelector;
     raytracer_config->DebugUseDiffractionAngleSelector = solver_config->DebugUseDiffractionAngleSelector;
     raytracer_config->DebugUseDiffractionPathSelector = solver_config->DebugUseDiffractionPathSelector;
     raytracer_config->DebugUseFermatSelector = solver_config->DebugUseFermatSelector;

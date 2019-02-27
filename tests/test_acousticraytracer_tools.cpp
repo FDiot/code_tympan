@@ -63,32 +63,32 @@ TEST(test_CleanerSelector_canBeInserted, nothing_events)
 	//Create several events, some with the type NOTHING
 	Event* e1=new Event();
 	e1->setType(SPECULARREFLEXION);
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	Event* e2=new Event();
 	e2->setType(NOTHING);
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 
 	SpecularReflexion* e3=new SpecularReflexion();
 	e3->setType(NOTHING);
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 	r->getEvents()->push_back(SPE3);
 
 	SpecularReflexion* e4=new SpecularReflexion();
 	e4->setType(SPECULARREFLEXION);
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 	r->getEvents()->push_back(SPE4);
 
 	Diffraction* e5=new Diffraction();
 	e5->setType(DIFFRACTION);
-	std::shared_ptr<Event> SPE5(e5);
+	boost::shared_ptr<Event> SPE5(e5);
 	r->getEvents()->push_back(SPE5);
 
 	Diffraction* e6=new Diffraction();
 	e6->setType(NOTHING);
-	std::shared_ptr<Event> SPE6(e6);
+	boost::shared_ptr<Event> SPE6(e6);
 	r->getEvents()->push_back(SPE6);
 
 	SELECTOR_RESPOND response=selector.canBeInserted(r,replace);
@@ -118,32 +118,32 @@ TEST(test_CleanerSelector_insertWithTest, nothing_events)
 	//Create several events, some with the type NOTHING
 	Event* e1=new Event();
 	e1->setType(NOTHING);
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	Event* e2=new Event();
 	e2->setType(DIFFRACTION);
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 
 	SpecularReflexion* e3=new SpecularReflexion();
 	e3->setType(SPECULARREFLEXION);
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 	r->getEvents()->push_back(SPE3);
 
 	SpecularReflexion* e4=new SpecularReflexion();
 	e4->setType(SPECULARREFLEXION);
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 	r->getEvents()->push_back(SPE4);
 
 	Diffraction* e5=new Diffraction();
 	e5->setType(NOTHING);
-	std::shared_ptr<Event> SPE5(e5);
+	boost::shared_ptr<Event> SPE5(e5);
 	r->getEvents()->push_back(SPE5);
 
 	Diffraction* e6=new Diffraction();
 	e6->setType(DIFFRACTION);
-	std::shared_ptr<Event> SPE6(e6);
+	boost::shared_ptr<Event> SPE6(e6);
 	r->getEvents()->push_back(SPE6);
 
 	EXPECT_TRUE(selector.insertWithTest(r)); //Test return value of insertWithTest
@@ -175,7 +175,7 @@ TEST(test_CloseEventSelector_canBeInserted, less_than_2_events)
 
 	//Add one event
 	Event* e1=new Event();
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	//nb events = 1 < 2   =>   response should be SELECTOR_ACCEPT
@@ -193,13 +193,13 @@ TEST(test_CloseEventSelector_canBeInserted, same_type_events)
 	//Add one event
 	SpecularReflexion* e1=new SpecularReflexion();
 	e1->setType(SPECULARREFLEXION);
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	//Add one event
 	SpecularReflexion* e2=new SpecularReflexion();
 	e2->setType(SPECULARREFLEXION);
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 
 	//two events of same type   =>   response should be SELECTOR_ACCEPT
@@ -218,13 +218,13 @@ TEST(test_CloseEventSelector_canBeInserted, different_type_events_occuring_on_di
 	//Add one event
 	SpecularReflexion* e1=new SpecularReflexion();
 	e1->setType(SPECULARREFLEXION);
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	//Add second event
 	Diffraction* e2=new Diffraction();
 	e2->setType(DIFFRACTION);
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 
 	//Add a shape to the first event
@@ -253,13 +253,13 @@ TEST(test_CloseEventSelector_canBeInserted, different_type_events_occuring_on_sa
 	//Add one event
 	SpecularReflexion* e1=new SpecularReflexion();
 	e1->setType(SPECULARREFLEXION);
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	//Add second event
 	Diffraction* e2=new Diffraction();
 	e2->setType(DIFFRACTION);
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 
 	//Add a shape to the first event
@@ -287,7 +287,7 @@ TEST(test_CloseEventSelector_insertWithTest, less_than_2_events)
 
 	//Add one event
 	Event* e1=new Event();
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	//nb events = 1 < 2   =>  return value should be TRUE
@@ -305,13 +305,13 @@ TEST(test_CloseEventSelector_insertWithTest, same_type_events)
 	//Add second event
 	Diffraction* e1=new Diffraction();
 	e1->setType(DIFFRACTION);
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	//Add second event
 	Diffraction* e2=new Diffraction();
 	e2->setType(DIFFRACTION);
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 
 	//two events of same type   =>   return value should be TRUE
@@ -329,13 +329,13 @@ TEST(test_CloseEventSelector_insertWithTest, different_type_events_occuring_on_d
 	//Add one event
 	Diffraction* e1=new Diffraction();
 	e1->setType(DIFFRACTION);
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	//Add one event
 	SpecularReflexion* e2=new SpecularReflexion();
 	e2->setType(SPECULARREFLEXION);
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 
 	//Add a shape to the first event
@@ -361,13 +361,13 @@ TEST(test_CloseEventSelector_insertWithTest, different_type_events_occuring_on_s
 	//Add one event
 	Diffraction* e1=new Diffraction();
 	e1->setType(DIFFRACTION);
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	//Add second event
 	SpecularReflexion* e2=new SpecularReflexion();
 	e2->setType(SPECULARREFLEXION);
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 
 	//Add a shape to the first event
@@ -417,7 +417,7 @@ TEST(test_DiffractionAngleSelector_canBeInserted, only_reflexions)
 	for(int i=0;i<5;i++){
 		SpecularReflexion* e=new SpecularReflexion();
 		e->setType(SPECULARREFLEXION);
-		std::shared_ptr<Event> SPE(e);
+		boost::shared_ptr<Event> SPE(e);
 		r->getEvents()->push_back(SPE);
 		r->setNbReflexion(r->getReflex()+1);	
 		}
@@ -456,7 +456,7 @@ TEST(test_DiffractionAngleSelector_canBeInserted, no_direction_change)
 	e->setType(DIFFRACTION);
 	e->setShape(s3); 
 	e->setPosition(initial_position+(final_position-initial_position)*(decimal)0.35); //Set the diffraction event's position to be between the source and the receptor
-	std::shared_ptr<Event> SPE(e);
+	boost::shared_ptr<Event> SPE(e);
 
 	r->getEvents()->push_back(SPE);
 	r->setNbDiffraction(r->getDiff()+1);
@@ -492,7 +492,7 @@ TEST(test_DiffractionAngleSelector_canBeInserted, ray_launched_in_shadow_zone)
 	e->setType(DIFFRACTION);
 	e->setShape(s3);
 	e->setPosition(vec3(0,0,0)); 
-	std::shared_ptr<Event> SPE(e);
+	boost::shared_ptr<Event> SPE(e);
 
 	r->getEvents()->push_back(SPE);
 	r->setNbDiffraction(r->getDiff()+1);
@@ -528,7 +528,7 @@ TEST(test_DiffractionAngleSelector_canBeInserted, ray_launched_outside_shadow_zo
 	e->setType(DIFFRACTION);
 	e->setShape(s3);
 	e->setPosition(vec3(0,0,0)); 
-	std::shared_ptr<Event> SPE(e);
+	boost::shared_ptr<Event> SPE(e);
 
 	r->getEvents()->push_back(SPE);
 	
@@ -559,7 +559,7 @@ TEST(test_DiffractionAngleSelector_insertWithTest, only_reflexions)
 	for(int i=0;i<5;i++){
 		SpecularReflexion* e=new SpecularReflexion();
 		e->setType(SPECULARREFLEXION);
-		std::shared_ptr<Event> SPE(e);
+		boost::shared_ptr<Event> SPE(e);
 		r->getEvents()->push_back(SPE);
 		r->setNbReflexion(r->getReflex()+1);
 	}
@@ -596,7 +596,7 @@ TEST(test_DiffractionAngleSelector_insertWithTest, no_direction_change)
 	e->setType(DIFFRACTION);
 	e->setShape(s3); 
 	e->setPosition(initial_position+(final_position-initial_position)*(decimal)0.72); //Set the diffraction event's position to be a linear combination of initial_position and direction
-	std::shared_ptr<Event> SPE(e);
+	boost::shared_ptr<Event> SPE(e);
 
 	r->getEvents()->push_back(SPE);
 	r->setNbDiffraction(r->getDiff()+1);
@@ -630,7 +630,7 @@ TEST(test_DiffractionAngleSelector_insertWithTest, ray_launched_in_shadow_zone)
 	e->setType(DIFFRACTION);
 	e->setShape(s3);
 	e->setPosition(vec3(0,0,0)); 
-	std::shared_ptr<Event> SPE(e);
+	boost::shared_ptr<Event> SPE(e);
 
 	r->getEvents()->push_back(SPE);
 	r->setNbDiffraction(r->getDiff()+1);
@@ -663,7 +663,7 @@ TEST(test_DiffractionAngleSelector_insertWithTest, ray_launched_outside_shadow_z
 	e->setType(DIFFRACTION);
 	e->setShape(s3);
 	e->setPosition(vec3(0,0,0)); 
-	std::shared_ptr<Event> SPE(e);
+	boost::shared_ptr<Event> SPE(e);
 
 	r->getEvents()->push_back(SPE);
 	
@@ -721,7 +721,7 @@ TEST(test_DiffractionPathSelector_canBeInserted, only_reflexions)
 		SpecularReflexion* e=new SpecularReflexion();
 		e->setType(SPECULARREFLEXION);
 		e->setPosition(vec3((decimal)(rand()%1000+1),(decimal)(rand()%1000+1),(decimal)(rand()%1000+1)));
-		std::shared_ptr<Event> SPE(e);
+		boost::shared_ptr<Event> SPE(e);
 		r->getEvents()->push_back(SPE);
 		r->setNbReflexion(r->getReflex()+1);
 	}
@@ -754,25 +754,25 @@ TEST(test_DiffractionPathSelector_canBeInserted, cumul_delta_low_enough)
 	Diffraction* e1=new Diffraction();
 	e1->setType(DIFFRACTION);
 	e1->setPosition(vec3(10,10,8));
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	SpecularReflexion* e2=new SpecularReflexion();
 	e2->setType(SPECULARREFLEXION);
 	e2->setPosition(vec3(16,7,3));
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 	
 	SpecularReflexion* e3=new SpecularReflexion();
 	e3->setType(SPECULARREFLEXION);
 	e3->setPosition(vec3(22,13,-1));
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 	r->getEvents()->push_back(SPE3);
 
 	Diffraction* e4=new Diffraction();
 	e4->setType(DIFFRACTION);
 	e4->setPosition(vec3(27,7,4));
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 	r->getEvents()->push_back(SPE4);
 
 	SELECTOR_RESPOND response=selector.canBeInserted(r,replace);
@@ -803,25 +803,25 @@ TEST(test_DiffractionPathSelector_canBeInserted, cumul_delta_too_high)
 	Diffraction* e1=new Diffraction();
 	e1->setType(DIFFRACTION);
 	e1->setPosition(vec3(-1,4,-2));
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	SpecularReflexion* e2=new SpecularReflexion();
 	e2->setType(SPECULARREFLEXION);
 	e2->setPosition(vec3(5,-3,0));
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 	
 	Diffraction* e3=new Diffraction();
 	e3->setType(DIFFRACTION);
 	e3->setPosition(vec3(15,7,4));
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 	r->getEvents()->push_back(SPE3);
 
 	SpecularReflexion* e4=new SpecularReflexion();
 	e4->setType(SPECULARREFLEXION);
 	e4->setPosition(vec3(18,-3,-1));
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 	r->getEvents()->push_back(SPE4);
 
 	SELECTOR_RESPOND response=selector.canBeInserted(r,replace);
@@ -866,7 +866,7 @@ TEST(test_DiffractionPathSelector_insertWithTest, only_reflexions)
 		SpecularReflexion* e=new SpecularReflexion();
 		e->setType(SPECULARREFLEXION);
 		e->setPosition(vec3((decimal)(rand()%1000+1),(decimal)(rand()%1000+1),(decimal)(rand()%1000+1)));
-		std::shared_ptr<Event> SPE(e);
+		boost::shared_ptr<Event> SPE(e);
 		r->getEvents()->push_back(SPE);
 		r->setNbReflexion(r->getReflex()+1);
 	}
@@ -897,25 +897,25 @@ TEST(test_DiffractionPathSelector_insertWithTest, cumul_delta_low_enough)
 	Diffraction* e1=new Diffraction();
 	e1->setType(DIFFRACTION);
 	e1->setPosition(vec3(10,10,8));
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	SpecularReflexion* e2=new SpecularReflexion();
 	e2->setType(SPECULARREFLEXION);
 	e2->setPosition(vec3(16,7,3));
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 	
 	SpecularReflexion* e3=new SpecularReflexion();
 	e3->setType(SPECULARREFLEXION);
 	e3->setPosition(vec3(22,13,-1));
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 	r->getEvents()->push_back(SPE3);
 
 	Diffraction* e4=new Diffraction();
 	e4->setType(DIFFRACTION);
 	e4->setPosition(vec3(27,7,4));
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 	r->getEvents()->push_back(SPE4);
 
 	EXPECT_TRUE(selector.insertWithTest(r));  //cumul_delta = 11.49 < 11.5 => should return TRUE
@@ -944,25 +944,25 @@ TEST(test_DiffractionPathSelector_insertWithTest, cumul_delta_too_high)
 	Diffraction* e1=new Diffraction();
 	e1->setType(DIFFRACTION);
 	e1->setPosition(vec3(-1,4,-2));
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	SpecularReflexion* e2=new SpecularReflexion();
 	e2->setType(SPECULARREFLEXION);
 	e2->setPosition(vec3(5,-3,0));
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 	
 	Diffraction* e3=new Diffraction();
 	e3->setType(DIFFRACTION);
 	e3->setPosition(vec3(15,7,4));
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 	r->getEvents()->push_back(SPE3);
 
 	SpecularReflexion* e4=new SpecularReflexion();
 	e4->setType(SPECULARREFLEXION);
 	e4->setPosition(vec3(18,-3,-1));
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 	r->getEvents()->push_back(SPE4);
 
 	EXPECT_FALSE(selector.insertWithTest(r));  //cumul_delta = 14.17 > 14 => should reutrn FALSE
@@ -1238,32 +1238,32 @@ TEST(test_FaceSelector_canBeInserted, history_primitive_mode)
 	Event* e1=new Event();
 	e1->setShape(shapes[0]);
 	e1->setPosition(vec3(48,-25,74));
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 
 	Event* e2=new Event();
 	e2->setShape(shapes[1]);
 	e2->setPosition(vec3(24,11,-62));
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 
 	Event* e3=new Event();
 	e3->setShape(shapes[1]);
 	e3->setPosition(vec3(37,-7,26)); 
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 
 	Event* e4=new Event();
 	e4->setShape(shapes[2]);
 	e4->setPosition(vec3(-12,88,-42));
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 
 	Event* e5=new Event();
 	e5->setShape(shapes[2]);
 	e5->setPosition(vec3(57,-18,33));
-	std::shared_ptr<Event> SPE5(e5);
+	boost::shared_ptr<Event> SPE5(e5);
 
 	Event* e6=new Event();
 	e6->setShape(shapes[3]);
 	e4->setPosition(vec3(78,-51,36));
-	std::shared_ptr<Event> SPE6(e6);
+	boost::shared_ptr<Event> SPE6(e6);
 
 	//Assign events to the rays
 	r1->getEvents()->push_back(SPE1);
@@ -1365,32 +1365,32 @@ TEST(test_FaceSelector_canBeInserted, history_face_mode)
 	Event* e1=new Event();
 	e1->setShape(shapes[0]);
 	e1->setPosition(vec3(48,-25,74));
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 
 	Event* e2=new Event();
 	e2->setShape(shapes[1]);
 	e2->setPosition(vec3(24,11,-62));
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 
 	Event* e3=new Event();
 	e3->setShape(shapes[1]);
 	e3->setPosition(vec3(37,-7,26)); 
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 
 	Event* e4=new Event();
 	e4->setShape(shapes[2]);
 	e4->setPosition(vec3(-12,88,-42));
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 
 	Event* e5=new Event();
 	e5->setShape(shapes[2]);
 	e5->setPosition(vec3(57,-18,33));
-	std::shared_ptr<Event> SPE5(e5);
+	boost::shared_ptr<Event> SPE5(e5);
 
 	Event* e6=new Event();
 	e6->setShape(shapes[3]);
 	e4->setPosition(vec3(78,-51,36));
-	std::shared_ptr<Event> SPE6(e6);
+	boost::shared_ptr<Event> SPE6(e6);
 
 	//Assign events to the rays
 	r1->getEvents()->push_back(SPE1);
@@ -1488,32 +1488,32 @@ TEST(test_FaceSelector_insertWithTest, history_primitive_mode)
 	Event* e1=new Event();
 	e1->setShape(shapes[0]);
 	e1->setPosition(vec3(48,-25,74));
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 
 	Event* e2=new Event();
 	e2->setShape(shapes[1]);
 	e2->setPosition(vec3(24,11,-62));
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 
 	Event* e3=new Event();
 	e3->setShape(shapes[1]);
 	e3->setPosition(vec3(37,-7,26)); 
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 
 	Event* e4=new Event();
 	e4->setShape(shapes[2]);
 	e4->setPosition(vec3(-12,88,-42));
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 
 	Event* e5=new Event();
 	e5->setShape(shapes[2]);
 	e5->setPosition(vec3(57,-18,33));
-	std::shared_ptr<Event> SPE5(e5);
+	boost::shared_ptr<Event> SPE5(e5);
 
 	Event* e6=new Event();
 	e6->setShape(shapes[3]);
 	e4->setPosition(vec3(78,-51,36));
-	std::shared_ptr<Event> SPE6(e6);
+	boost::shared_ptr<Event> SPE6(e6);
 
 	//Assign events to the rays
 	r1->getEvents()->push_back(SPE1);
@@ -1608,32 +1608,32 @@ TEST(test_FaceSelector_insertWithTest, history_face_mode)
 	Event* e1=new Event();
 	e1->setShape(shapes[0]);
 	e1->setPosition(vec3(48,-25,74));
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 
 	Event* e2=new Event();
 	e2->setShape(shapes[1]);
 	e2->setPosition(vec3(24,11,-62));
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 
 	Event* e3=new Event();
 	e3->setShape(shapes[1]);
 	e3->setPosition(vec3(37,-7,26)); 
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 
 	Event* e4=new Event();
 	e4->setShape(shapes[2]);
 	e4->setPosition(vec3(-12,88,-42));
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 
 	Event* e5=new Event();
 	e5->setShape(shapes[2]);
 	e5->setPosition(vec3(57,-18,33));
-	std::shared_ptr<Event> SPE5(e5);
+	boost::shared_ptr<Event> SPE5(e5);
 
 	Event* e6=new Event();
 	e6->setShape(shapes[3]);
 	e4->setPosition(vec3(78,-51,36));
-	std::shared_ptr<Event> SPE6(e6);
+	boost::shared_ptr<Event> SPE6(e6);
 
 	//Assign events to the rays
 	r1->getEvents()->push_back(SPE1);
@@ -2387,17 +2387,17 @@ TEST(test_ReflectionSelector_canBeInserted, ground_reflection)
 	//Set events
 	SpecularReflexion* e1=new SpecularReflexion();
 	e1->setShape(shape1);
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	SpecularReflexion* e2=new SpecularReflexion();
 	e2->setShape(shape2);
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 
 	Diffraction* e3=new Diffraction();
 	e3->setShape(shape1);
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 
 	r->setNbReflexion(1); 
 	SELECTOR_RESPOND response=selector.canBeInserted(r,replace);
@@ -2532,17 +2532,17 @@ TEST(test_ReflectionSelector_insertWithTest, ground_reflection)
 	//Set events
 	SpecularReflexion* e1=new SpecularReflexion();
 	e1->setShape(shape1);
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 	r->getEvents()->push_back(SPE1);
 
 	SpecularReflexion* e2=new SpecularReflexion();
 	e2->setShape(shape2);
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 	r->getEvents()->push_back(SPE2);
 
 	Diffraction* e3=new Diffraction();
 	e3->setShape(shape1);
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 
 	r->setNbReflexion(1); 
 	EXPECT_TRUE(selector.insertWithTest(r)); //1 <= 1 => should return TRUE
@@ -2681,32 +2681,32 @@ TEST(test_SelectorManager, appendData)
 	Event* e1=new Event();
 	e1->setShape(shapes[0]);
 	e1->setPosition(vec3(48,-25,74));
-	std::shared_ptr<Event> SPE1(e1);
+	boost::shared_ptr<Event> SPE1(e1);
 
 	Event* e2=new Event();
 	e2->setShape(shapes[1]);
 	e2->setPosition(vec3(24,11,-62));
-	std::shared_ptr<Event> SPE2(e2);
+	boost::shared_ptr<Event> SPE2(e2);
 
 	Event* e3=new Event();
 	e3->setShape(shapes[1]);
 	e3->setPosition(vec3(37,-7,26)); 
-	std::shared_ptr<Event> SPE3(e3);
+	boost::shared_ptr<Event> SPE3(e3);
 
 	Event* e4=new Event();
 	e4->setShape(shapes[2]);
 	e4->setPosition(vec3(-12,88,-42));
-	std::shared_ptr<Event> SPE4(e4);
+	boost::shared_ptr<Event> SPE4(e4);
 
 	Event* e5=new Event();
 	e5->setShape(shapes[2]);
 	e5->setPosition(vec3(57,-18,33));
-	std::shared_ptr<Event> SPE5(e5);
+	boost::shared_ptr<Event> SPE5(e5);
 
 	Event* e6=new Event();
 	e6->setShape(shapes[3]);
 	e4->setPosition(vec3(78,-51,36));
-	std::shared_ptr<Event> SPE6(e6);
+	boost::shared_ptr<Event> SPE6(e6);
 
 	//Assign events to the rays
 	r1->getEvents()->push_back(SPE1);

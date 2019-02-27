@@ -58,8 +58,8 @@ public:
     bool DiffractionDropDownNbRays; //!< Flag to reduce the number of rays thrown depending on the diffraction order
 
     // Post Filters
-    bool UsePostFilter; //!< Flag to use some specifics Selector
-    bool DebugUseCloseEventPostFilter; //!< Flag to add the the CloseEventSelector filter
+    bool UsePostFilters; //!< Flag to use some specifics Selector
+    bool DebugUseCloseEventSelector; //!< Flag to add the the CloseEventSelector filter
     bool DebugUseDiffractionAngleSelector; //!< Flag to add the DiffractionAngleSelector filter
     bool DebugUseDiffractionPathSelector; //!< Flag to add the DiffractionPathSelector filter
     bool DebugUseFermatSelector; //!< Flag to add the FermatSelector filter

@@ -78,7 +78,7 @@ decimal Ray::computeEventsSequenceLength()
 
 	if ( events.size() == 0 ) { return 0; }
 
-	std::vector< std::shared_ptr<Event> > :: iterator iter = events.begin();
+	std::vector< boost::shared_ptr<Event> > :: iterator iter = events.begin();
 
 	vec3 previous = (*iter)->getPosition();
 	vec3 current(0., 0., 0.);
@@ -187,7 +187,7 @@ decimal Ray::computePertinentLength(const vec3& ref, const vec3& lastPos, vec3& 
                 {
                     
                     // Get the last event (begining of the reverse iterator)
-                    std::vector< std::shared_ptr<Event> >::reverse_iterator rit = events.rbegin();
+                    std::vector< boost::shared_ptr<Event> >::reverse_iterator rit = events.rbegin();
                     // Get the position of the lastEvent
                     previous = (*rit)->getPosition();
 
@@ -220,7 +220,7 @@ Base* Ray::getLastPertinentEventOrSource(typeevent evType)
 {
     Base* res = (Base*) source;
 
-    for (std::vector< std::shared_ptr<Event> > :: iterator iter = events.begin(); iter != events.end(); ++iter)
+    for (std::vector< boost::shared_ptr<Event> > :: iterator iter = events.begin(); iter != events.end(); ++iter)
     {
 		if ( (*iter)->getType() == evType ) { res = (Base*) ( (*iter).get() ); }
     }

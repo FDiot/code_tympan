@@ -22,6 +22,8 @@
 #include "Geometry/Scene.h"
 #include "Ray/Ray.h"
 #include "Recepteur.h"
+#include "Tools/SelectorManager.h"
+#include "Acoustic/Solver.h"
 
 /*!
 * \file Solver.h
@@ -120,6 +122,46 @@ public:
 protected:
     deque<Ray*> valid_rays;    //!< Rays list which are validated by the solver
     deque<Ray*> debug_rays;    //!< Rays list which are invalidated by the solver
+};
+
+class BasicSolver : public Solver
+{
+
+public:
+
+    BasicSolver() : Solver() {}
+    ~BasicSolver() {}
+    virtual bool postTreatmentScene(Scene* scene, std::vector<Source>& sources, std::vector<Recepteur>& recepteurs);
+
+    //virtual double leafTreatment(KdTree *kdtree, BVH* bvh, Ray *r, vector<struct Isect> &primitives);
+
+    virtual bool valideIntersection(Ray* r, Intersection* inter);
+
+    virtual bool valideRayon(Ray* r);
+
+    virtual bool invalidRayon(Ray* r);
+
+    // * \fn vector<Ray*>* getValidRays()
+    // * \brief Return the list of valid rays
+    // * \return Pointer to the vector containing the rays validated by the solver
+    // */
+    // vector<Ray*>* getValidRays(){ return &valid_rays;}
+
+    virtual void finish();
+
+    //virtual void clean();
+
+    bool _useFresnelArea; //!< Flag to use Fresnel weighting
+
+
+protected:
+    SelectorManager<Ray> selectorManagerIntersection;
+    SelectorManager<Ray> selectorManagerValidation;
+
+#ifdef _ALLOW_TARGETING_
+protected :
+    TargetManager targetManager;
+#endif //_ALLOW_TARGETING_
 };
 
 #endif // SOLVER_H
