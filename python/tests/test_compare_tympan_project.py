@@ -51,14 +51,6 @@ class Test(TympanTC):
         app.relaunch = 1
         self.assertEqual(app.launch_compare(), True)
 
-    def test_global(self):
-        """ Global test """
-        reference_project = "modele_test.xml"  # Complex model
-        app = App(None, False)
-        app.load_reference_xml_file(reference_project)
-        app.load_compared_xml_file(reference_project)
-        self.assertEqual(app.launch_compare(), True)
-
 
 if __name__ == '__main__':
     os.chdir(os.path.join(TOOLBOX_DATA_DIR, 'Compare_Tympan_Project'))
