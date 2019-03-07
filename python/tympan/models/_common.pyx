@@ -116,7 +116,7 @@ cdef class Point3D:
         self.thisobj._z = z
 
     def __repr__(self):
-        return '({x}, {y}, {z})'.format(x=self.x, y=self.y, z=self.z)
+        return 'Point3D({x}, {y}, {z})'.format(x=self.x, y=self.y, z=self.z)
 
     def set_x(self, x):
         self.thisobj._x = x
