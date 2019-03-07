@@ -416,12 +416,9 @@ cdef class Business2SolverConverter:
                 # if control point state == active (with respect to the current computation)
                 if mesh_points[j].getRealPointer().etat(self.comp.thisptr.getRealPointer()):
                     # Move receptor to a global scale
-                    point3d  = cy.declare(tycommon.OPoint3D,
-                                          tycommon.dot(matrix, mesh_points[j].getRealPointer()[0]))
-                    mesh_points[j].getRealPointer()._x = point3d._x
-                    mesh_points[j].getRealPointer()._y = point3d._y
-                    mesh_points[j].getRealPointer()._z = point3d._z
-                    x, y, z = point_coordinates((mesh_points[j].getRealPointer())[0])
+                    point3d = cy.declare(tycommon.OPoint3D,
+                                         tycommon.dot(matrix, mesh_points[j].getRealPointer()[0]))
+                    x, y, z = point_coordinates(point3d)
                     rec_idx = model.add_receptor(x, y, z)
                     rec_uuid = id_str(mesh_points[j].getRealPointer())
                     self.bus2solv_receptors[rec_uuid] = rec_idx
