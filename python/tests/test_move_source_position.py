@@ -53,8 +53,9 @@ class Test(TympanTC):
 
     def test_non_regression(self):
         """ Check the results compared to expected ones """
-        main("Source_mobile.xml", [["engine", "A320.xml", "A320.csv"]], "Resultat.xml", gui=False)
-        compare_xml_results("Resultat.xml", "Reference.xml", self)
+        main("Source_mobile.xml", [
+             ["engine", "A320.xml", "A320.csv"]], "Resultat.xml", gui=False)
+        compare_xml_meshes_results("Resultat.xml", "Reference.xml", self)
 
     def test_global(self):
         """  Global test """
