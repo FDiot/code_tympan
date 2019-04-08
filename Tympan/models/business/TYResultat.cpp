@@ -575,9 +575,9 @@ void TYResultat::saveSpectre(const std::string& filename, TYCalcul* pSubstCalcul
             // On recupere le spectre au point
             TYPointCalcul* pPtCalc = getRecepteur(col);
             OSpectre spectre = *pCalcul->getSpectre( pPtCalc->getID() );//*pPtCalc->getSpectre(pCalcul);
-            OSpectre otherSpectum = *pSubstCalcul->getSpectre(pPtCalc->getID());
             if (pSubstCalcul != NULL)
             {
+                OSpectre otherSpectum = *pSubstCalcul->getSpectre(pPtCalc->getID());
                 spectre = getEmergence( spectre, otherSpectum ); //*pPtCalc->getSpectre(pSubstCalcul));
             }
             spectre.setType(SPECTRE_TYPE_LP);
