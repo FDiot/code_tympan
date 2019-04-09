@@ -213,7 +213,7 @@ cdef class Business2SolverConverter:
         condensate_matrix.resize(
             len(self.bus2solv_receptors), len(self.macro2micro_sources))
         # Go through all the business receptors
-        for brec_id in self.bus2solv_receptors:
+        for brec_id in sorted(self.bus2solv_receptors, key=lambda k: self.bus2solv_receptors[k]):
             receptor = cy.declare(cy.pointer(tybusiness.TYPointCalcul))
             receptor = tybusiness.downcast_point_calcul(
                 deref(self.instances_mapping.find(brec_id)).second)
