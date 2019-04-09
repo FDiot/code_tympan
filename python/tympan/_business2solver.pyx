@@ -16,6 +16,7 @@ from tympan.models cimport _common as tycommon
 cdef point_coordinates(tycommon.OPoint3D point):
     return point._x, point._y, point._z
 
+
 def points_as_array(points):
     """Return a Numpy array from `points` sequence of Point3D."""
     return np.array([(p.x, p.y, p.z) for p in points])
@@ -55,7 +56,8 @@ def acoustic_solver_by_name(name, foldername):
     """Load an acoustic solver from its name."""
     # load_solvers(foldername.encode('utf-8'))
     # To avoid Cython error message "Obtaining 'char const *' from temporary Python value"
-    # See http://cython.readthedocs.io/en/latest/src/userguide/language_basics.html#caveats-when-using-a-python-string-in-a-c-context
+    # See
+    # http://cython.readthedocs.io/en/latest/src/userguide/language_basics.html#caveats-when-using-a-python-string-in-a-c-context
     pystring = foldername.encode('utf-8')
     load_solvers(pystring)
     solver_id = cy.declare(OGenID, tybusiness.solver_id(name.encode('utf-8')))
@@ -69,7 +71,8 @@ def acoustic_solver_from_computation(computation, foldername):
     """Load an acoustic solver from a computation."""
     # load_solvers(foldername.encode('utf-8'))
     # To avoid Cython error message "Obtaining 'char const *' from temporary Python value"
-    # See http://cython.readthedocs.io/en/latest/src/userguide/language_basics.html#caveats-when-using-a-python-string-in-a-c-context
+    # See
+    # http://cython.readthedocs.io/en/latest/src/userguide/language_basics.html#caveats-when-using-a-python-string-in-a-c-context
     pystring = foldername.encode('utf-8')
     load_solvers(pystring)
     solver = cy.declare(tysolver.Solver, tysolver.Solver())
@@ -78,7 +81,7 @@ def acoustic_solver_from_computation(computation, foldername):
     return solver
 
 
-cdef id_str(tybusiness.TYElement* elt):
+cdef id_str(tybusiness.TYElement * elt):
     """Return 'elt' unique ID as a string"""
     return elt.getID().toString().toStdString()
 
@@ -101,13 +104,16 @@ cdef class Business2SolverConverter:
     # macro source uuid to micro source uuid (both from business model)
     macro2micro_sources = cy.declare(dict)
 
-    # transitional result matrix (from solver matrix to condensed business matrix)
-    transitional_result_matrix = cy.declare(cy.pointer(tycommon.SpectrumMatrix))
+    # transitional result matrix (from solver matrix to condensed business
+    # matrix)
+    transitional_result_matrix = cy.declare(
+        cy.pointer(tycommon.SpectrumMatrix))
     # maps an UUID to the corresponding TYElement*
     # XXX Can't use a dict because of the "Cannot convert 'Thing*' to Python object"
     # compilation error. One solution would be to use CObjects
     # (PyCObject_FromVoidPtr/PyCObject_AsVoidPtr) to add and get back the pointer.
-    instances_mapping = cy.declare(map[string, cy.pointer(tybusiness.TYElement)])
+    instances_mapping = cy.declare(
+        map[string, cy.pointer(tybusiness.TYElement)])
 
     @cy.locals(comp=tybusiness.Computation, site=tybusiness.Site)
     def __cinit__(self, comp, site):
@@ -146,7 +152,8 @@ cdef class Business2SolverConverter:
         business_rays_tab = cy.declare(cy.pointer(vector[SmartPtr[tybusiness.TYRay]]),
                                        cy.address(self.comp.thisptr.getRealPointer().getTabRays()))
         for solver_ray in solver_rays_tab:
-            business_rays_tab.push_back(tybusiness.build_ray(deref(solver_ray)))
+            business_rays_tab.push_back(
+                tybusiness.build_ray(deref(solver_ray)))
 
     @cy.locals(model=tysolver.ProblemModel, result=tysolver.ResultModel)
     def update_business_receptors(self, model, result):
@@ -155,7 +162,8 @@ cdef class Business2SolverConverter:
         Once the acoustic problem has been solved, send back the acoustic results
         to the business receptors
         """
-        # resize business result matrix with the number of enabled sources and receptors:
+        # resize business result matrix with the number of enabled sources and
+        # receptors:
         business_result = cy.declare(tybusiness.Result, self.comp.result)
         business_result_matrix = cy.declare(
             cy.pointer(tycommon.SpectrumMatrix),
@@ -174,13 +182,14 @@ cdef class Business2SolverConverter:
             cumul_spectrum.setDefaultValue(0.0)
             for spectrum in spectra:
                 cumul_spectrum = cumul_spectrum.sum(spectrum)
-            cumul_spectrum.setType(tycommon.SPECTRE_TYPE_LP) # enum TYSpectreType from OSpectre
+            # enum TYSpectreType from OSpectre
+            cumul_spectrum.setType(tycommon.SPECTRE_TYPE_LP)
             # The values retrieved from the solver are linear. We want to convert
             # them to DB.
             cumul_spectrum.setEtat(tycommon.SPECTRE_ETAT_LIN)
             cumul_spectrum = cumul_spectrum.toDB()
 
-            #adaptation nouvelle structure TYPointControle
+            # adaptation nouvelle structure TYPointControle
             bus_spectrum = cy.declare(cy.pointer(tybusiness.TYSpectre))
             bus_spectrum = new tybusiness.TYSpectre(cumul_spectrum)
             self.comp.thisptr.getRealPointer().setSpectre(receptor, bus_spectrum)
@@ -201,7 +210,8 @@ cdef class Business2SolverConverter:
                                self.comp.thisptr.getRealPointer().getResultat().getRealPointer())
         result_sources = cy.declare(map[tybusiness.TYElem_ptr, int])
         condensate_matrix = cy.declare(tycommon.SpectrumMatrix)
-        condensate_matrix.resize(len(self.bus2solv_receptors), len(self.macro2micro_sources))
+        condensate_matrix.resize(
+            len(self.bus2solv_receptors), len(self.macro2micro_sources))
         # Go through all the business receptors
         for brec_id in self.bus2solv_receptors:
             receptor = cy.declare(cy.pointer(tybusiness.TYPointCalcul))
@@ -230,8 +240,10 @@ cdef class Business2SolverConverter:
                 # them to DB.
                 cumul_spectrum.setEtat(tycommon.SPECTRE_ETAT_LIN)
                 cumul_spectrum = cumul_spectrum.toDB()
-                condensate_matrix.setSpectre(receptor_id, source_counter, cumul_spectrum)
-                macro_source = deref(self.instances_mapping.find(macro_source_id)).second
+                condensate_matrix.setSpectre(
+                    receptor_id, source_counter, cumul_spectrum)
+                macro_source = deref(
+                    self.instances_mapping.find(macro_source_id)).second
                 result_sources[macro_source] = source_counter
                 source_counter += 1
         busresult.setResultMatrix(condensate_matrix)
@@ -276,14 +288,16 @@ cdef class Business2SolverConverter:
         # Retrieve all the infrastructure sources for the current site, each
         # one linked to a list of sub-sources
         infra_sources = cy.declare(map[tybusiness.TYElem_ptr,
-                                     vector[SmartPtr[tybusiness.TYGeometryNode]]])
+                                       vector[SmartPtr[tybusiness.TYGeometryNode]]])
         infra.getAllSrcs(self.comp.thisptr.getRealPointer(), infra_sources)
-        # Go through the sources of the current site and build solver sources accordingly
+        # Go through the sources of the current site and build solver sources
+        # accordingly
         sources = cy.declare(vector[SmartPtr[tybusiness.TYGeometryNode]])
-        sources_of_elt = cy.declare(vector[SmartPtr[tybusiness.TYGeometryNode]])
+        sources_of_elt = cy.declare(
+            vector[SmartPtr[tybusiness.TYGeometryNode]])
         its = cy.declare(map[tybusiness.TYElem_ptr,
                              vector[SmartPtr[tybusiness.TYGeometryNode]]].iterator,
-                        infra_sources.begin())
+                         infra_sources.begin())
         business_src = cy.declare(tybusiness.TYElem_ptr)
         nb_sources = 0
         # For each business macro source (ex: machine, building...)
@@ -295,7 +309,8 @@ cdef class Business2SolverConverter:
             nsubsources = sources_of_elt.size()
             # For each of the micro sources making the macro one
             for ssource in sources_of_elt:
-                # TYGeometryNode objects contain TYSourcePonctuelle objects as their element
+                # TYGeometryNode objects contain TYSourcePonctuelle objects as
+                # their element
                 if ssource.getRealPointer() == NULL:
                     continue
                 # Get it
@@ -308,10 +323,12 @@ cdef class Business2SolverConverter:
                 globalmatrix = cy.declare(tycommon.OMatrix,
                                           site.matrix.dot(ssource.getRealPointer().getMatrix()))
                 # Convert its position to the global frame
-                point3d  = cy.declare(tycommon.OPoint3D, tycommon.dot(globalmatrix, ppoint[0]))
+                point3d = cy.declare(
+                    tycommon.OPoint3D, tycommon.dot(globalmatrix, ppoint[0]))
                 # Directivity
                 # solver model directivity
-                pdirectivity = cy.declare(cy.pointer(tysolver.SourceDirectivityInterface))
+                pdirectivity = cy.declare(cy.pointer(
+                    tysolver.SourceDirectivityInterface))
                 # business model directivity
                 pbus_directivity = cy.declare(cy.pointer(tybusiness.TYDirectivity),
                                               subsource.getDirectivity())
@@ -320,21 +337,22 @@ cdef class Business2SolverConverter:
                                          tybusiness.downcast_user_source_ponctuelle(subsource_elt))
                 if pusersource != NULL:
                     pdirectivity = new tysolver.SphericalSourceDirectivity()
-                else: #  it is a computed acoustic source
+                else:  # it is a computed acoustic source
                     pcompdirect = cy.declare(cy.pointer(tybusiness.TYComputedDirectivity),
                                              tybusiness.downcast_computed_directivity(
                                                  pbus_directivity))
                     # compute global directivity
                     glob_directivity = cy.declare(tycommon.OVector3D,
                                                   tycommon.OVector3D(pcompdirect.DirectivityVector))
-                    glob_directivity = tycommon.dot(globalmatrix, glob_directivity)
+                    glob_directivity = tycommon.dot(
+                        globalmatrix, glob_directivity)
                     if pcompdirect.Type == tybusiness.Surface:
                         pdirectivity = new tysolver.VolumeFaceDirectivity(glob_directivity,
                                                                           pcompdirect.SpecificSize)
                     elif pcompdirect.Type == tybusiness.Baffled:
                         pdirectivity = new tysolver.BaffledFaceDirectivity(glob_directivity,
                                                                            pcompdirect.SpecificSize)
-                    else: # Chimney
+                    else:  # Chimney
                         pdirectivity = new tysolver.ChimneyFaceDirectivity(glob_directivity,
                                                                            pcompdirect.SpecificSize)
                 # Add it to the solver model
@@ -360,7 +378,8 @@ cdef class Business2SolverConverter:
                 # Record where it has been stored
                 self.bus2solv_sources[id_str(subsource_elt)] = source_idx
                 # Copy source mapping to macro2micro_sources
-                self.macro2micro_sources[macro_source_id].append(id_str(subsource))
+                self.macro2micro_sources[
+                    macro_source_id].append(id_str(subsource))
                 self.instances_mapping[macro_source_id] = business_src
                 nb_sources += 1
             inc(its)
@@ -388,15 +407,19 @@ cdef class Business2SolverConverter:
         rec_idx = cy.declare(size_t)
         nb_receptors = 0
         for i in xrange(n_ctrl_pts):
-            # if control point state == active (with respect to the current computation)
+            # if control point state == active (with respect to the current
+            # computation)
             if control_points[i].getRealPointer().etat(self.comp.thisptr.getRealPointer()):
                 # inheritance: TYPointControl > TYPointCalcul > TYPoint > tycommon.OPoint3D > OCoord3D
-                # call to tycommon.OPoint3D copy constructor to record control point coordinates
-                x, y, z = point_coordinates((control_points[i].getRealPointer())[0])
+                # call to tycommon.OPoint3D copy constructor to record control
+                # point coordinates
+                x, y, z = point_coordinates(
+                    (control_points[i].getRealPointer())[0])
                 rec_idx = model.add_receptor(x, y, z)
                 rec_uuid = id_str(control_points[i].getRealPointer())
                 self.bus2solv_receptors[rec_uuid] = rec_idx
-                self.instances_mapping[rec_uuid] = control_points[i].getRealPointer()
+                self.instances_mapping[
+                    rec_uuid] = control_points[i].getRealPointer()
                 nb_receptors += 1
         # Then add mesh points to the acoustic problem model
         meshes = cy.declare(vector[SmartPtr[tybusiness.TYGeometryNode]],
@@ -405,15 +428,18 @@ cdef class Business2SolverConverter:
         mesh_points = cy.declare(vector[SmartPtr[tybusiness.TYPointCalcul]])
         nmeshes = meshes.size()
         for i in xrange(nmeshes):
-            matrix = cy.declare(tycommon.OMatrix, meshes[i].getRealPointer().getMatrix())
-            mesh = tybusiness.downcast_maillage(meshes[i].getRealPointer().getElement())
+            matrix = cy.declare(tycommon.OMatrix, meshes[
+                                i].getRealPointer().getMatrix())
+            mesh = tybusiness.downcast_maillage(
+                meshes[i].getRealPointer().getElement())
             # mesh point must be active
-            if mesh.etat() == False: # enum value from MaillageState (class TYMaillage)
+            if mesh.etat() == False:  # enum value from MaillageState (class TYMaillage)
                 continue
             mesh_points = mesh.getPtsCalcul()
             n_mesh_points = mesh_points.size()
             for j in xrange(n_mesh_points):
-                # if control point state == active (with respect to the current computation)
+                # if control point state == active (with respect to the current
+                # computation)
                 if mesh_points[j].getRealPointer().etat(self.comp.thisptr.getRealPointer()):
                     # Move receptor to a global scale
                     point3d = cy.declare(tycommon.OPoint3D,
@@ -422,7 +448,8 @@ cdef class Business2SolverConverter:
                     rec_idx = model.add_receptor(x, y, z)
                     rec_uuid = id_str(mesh_points[j].getRealPointer())
                     self.bus2solv_receptors[rec_uuid] = rec_idx
-                    self.instances_mapping[rec_uuid] = mesh_points[j].getRealPointer()
+                    self.instances_mapping[
+                        rec_uuid] = mesh_points[j].getRealPointer()
                     # We won't keep mesh points in the final result matrix
                     self.to_be_removed_receptors.append(rec_uuid)
                     nb_receptors += 1
