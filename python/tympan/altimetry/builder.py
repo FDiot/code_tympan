@@ -310,6 +310,13 @@ class MeshBuilder(object):
                 mean_alt = np.mean([mesh.vertices_info[vh].altitude
                                     for vh in polyline])
                 close_it = polyline[0] != polyline[-1]
+                if close_it:
+                    mean_alt = np.mean([mesh.vertices_info[vh].altitude
+                                        for vh in polyline])
+                else:
+                    mean_alt = np.mean([mesh.vertices_info[vh].altitude
+                                        for vh in polyline[:-1]])
+
                 contour_vertices = mesh.iter_vertices_for_input_polyline(
                     polyline, close_it=close_it)
                 flooder = mesh.flood_polygon(LandtakeFaceFlooder, polyline,
