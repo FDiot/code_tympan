@@ -1232,37 +1232,65 @@ void TYSiteNode::getFacesOnGround(std::map<TYUUID, std::deque<TYTabPoint3D>>& co
     // Buildings
     for (unsigned int i = 0; i < _pInfrastructure->getListBatiment().size(); i++)
     {
-        // If this building is active in the current simulation
-        LPTYBatiment pBuilding = dynamic_cast<TYBatiment*>(_pInfrastructure->getBatiment(i)->getElement());
-        assert(pBuilding != nullptr && "found an object which is not a TYBatiment in _pInfrastructure->getListBatiment()");
-        if (pBuilding->isInCurrentCalcul())
+        // We get the geonode information : position and height of the building
+        LPTYBatimentGeoNode gBatiment = _pInfrastructure->getBatiment(i);
+        // If the building is not supposed to touch the ground, there is no need to get its contour
+        if (gBatiment->getHauteur() != 0)
         {
-            // Building transform matrix
-            OMatrix matrix = _pInfrastructure->getBatiment(i)->getMatrix();
-            TYTabAcousticVolumeGeoNode& building_volumes = pBuilding->getTabAcousticVol();
-            // 1 TYTabPoint3D per volume face on the ground. Indeed there may be several,
-            // since buildings and machines are volume nodes wghich means they
-            // are made of one or more volumes.
-            std::deque<TYTabPoint3D> base_faces;
-            // Get the base of the building
-            groundBasedFaces(building_volumes, matrix, contours);
+            continue;
+        }
+        // If it does touch the ground, we set its z-coordinate to 0 to avoid changes when we relaunch several times in a row (in which case we would use the calculated z)
+        else
+        {
+            OPoint3D position = gBatiment->position();
+            position._z = 0;
+            gBatiment->setPosition(position);
+            LPTYBatiment pBuilding = dynamic_cast<TYBatiment*>(gBatiment->getElement());
+            assert(pBuilding != nullptr && "found an object which is not a TYBatiment in _pInfrastructure->getListBatiment()");
+            // If this building is active in the current simulation
+            if (pBuilding->isInCurrentCalcul())
+            {
+                // Building transform matrix
+                OMatrix matrix = _pInfrastructure->getBatiment(i)->getMatrix();
+                TYTabAcousticVolumeGeoNode& building_volumes = pBuilding->getTabAcousticVol();
+                // 1 TYTabPoint3D per volume face on the ground. Indeed there may be several,
+                // since buildings and machines are volume nodes wghich means they
+                // are made of one or more volumes.
+                std::deque<TYTabPoint3D> base_faces;
+                // Get the base of the building
+                groundBasedFaces(building_volumes, matrix, contours);
+            }
         }
     }
     // Machines
     for (int i = 0; i < _pInfrastructure->getListMachine().size(); i++)
     {
-        // Si cette machine est active pour le calcul
-        LPTYMachine pMachine = dynamic_cast<TYMachine*>(_pInfrastructure->getMachine(i)->getElement());
-        assert(pMachine != nullptr && "found an object which is not a TYMachine in _pInfrastructure->getListMachine()");
-        if (pMachine->isInCurrentCalcul())
+        // We get the geonode information : position and height of the building
+        LPTYMachineGeoNode gMachine = _pInfrastructure->getMachine(i);
+        // If the machine is not supposed to touch the ground, there is no need to get its contour
+        if (gMachine->getHauteur() != 0)
         {
-            // Matrice de changement de repere pour cette machine
-            OMatrix matrix = _pInfrastructure->getMachine(i)->getMatrix();
-            TYTabAcousticVolumeGeoNode machine_volumes = pMachine->getTabAcousticVol();
-            std::deque<TYTabPoint3D> base_faces;
-            // Get the base of the machine
-            groundBasedFaces(machine_volumes, matrix, contours);
+            continue;
         }
+        // If it does touch the ground, we set its z-coordinate to 0 to avoid changes when we relaunch several times in a row (otherwise we would use the calculated z)
+        else
+        {
+            OPoint3D position = gMachine->position();
+            position._z = 0;
+            gMachine->setPosition(position);
+            // Si cette machine est active pour le calcul
+            LPTYMachine pMachine = dynamic_cast<TYMachine*>(gMachine->getElement());
+            assert(pMachine != nullptr && "found an object which is not a TYMachine in _pInfrastructure->getListMachine()");
+            if (pMachine->isInCurrentCalcul())
+            {
+                // Matrice de changement de repere pour cette machine
+                OMatrix matrix = _pInfrastructure->getMachine(i)->getMatrix();
+                TYTabAcousticVolumeGeoNode machine_volumes = pMachine->getTabAcousticVol();
+                std::deque<TYTabPoint3D> base_faces;
+                // Get the base of the machine
+                groundBasedFaces(machine_volumes, matrix, contours);
+            }
+         }
     }
 }
 
