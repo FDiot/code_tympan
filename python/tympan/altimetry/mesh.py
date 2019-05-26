@@ -766,7 +766,7 @@ class ElevationMesh(MeshedCDTWithInfo):
                     # before entering this method ?
                     info.altitude = 0
 
-    def flood_polygon(self, flooder_class, vertices, flood_right=False, close_it=False):
+    def flood_polygon(self, flooder_class, vertices, flood_right=False, close_it=True):
         """Flood the inside of a polygon given by its vertices list using the
         specified class of Flooder.
 
@@ -777,7 +777,7 @@ class ElevationMesh(MeshedCDTWithInfo):
 
         """
         faces_left, faces_right = left_and_right_faces(
-            self.iter_faces_for_input_polyline(vertices, close_it=True))
+            self.iter_faces_for_input_polyline(vertices, close_it))
         seed_faces = faces_right if flood_right else faces_left
         flooder = flooder_class(self)
         flooder.flood_from(seed_faces)
