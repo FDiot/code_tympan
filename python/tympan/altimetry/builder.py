@@ -24,6 +24,16 @@ def points_to_coords(points):
     return [(p.x, p.y) for p in points]
 
 
+def counter_clockwise_contours(points):
+    """Return a list of coordinates in counter_clockwise order from a list of Point3D"""
+    _is_counter_clockwise = lambda contour: sum(
+        [(p2.x - p1.x) * (p2.y + p1.y) for p1, p2 in zip(points, points[1:] + [points[0]])]) < 0
+    if _is_counter_clockwise(points):
+        return points_to_coords(points)
+    else:
+        return points_to_coords(points[::-1])
+
+
 def ground_material_from_business(material):
     """Return a GroundMaterial from a business model material"""
     return GroundMaterial(material.elem_id, material.resistivity)
@@ -97,7 +107,7 @@ def build_sitenode(ty_site, mainsite=True):
         altimetry_site.add_child(alcurve)
     # Ground contour (infrastructure landtake)
     for id_, volume_contours in ty_site.ground_contour.items():
-        contours_coords = map(points_to_coords, volume_contours)
+        contours_coords = map(counter_clockwise_contours, volume_contours)
         altimetry_site.add_child(
             InfrastructureLandtake(*contours_coords, id=id_))
     # Recurse
