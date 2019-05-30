@@ -24,14 +24,27 @@ def points_to_coords(points):
     return [(p.x, p.y) for p in points]
 
 
+def unique_points(points):
+    """Return points without "rounded" duplicates while preserving order"""
+    coords = lambda p: (p.x, p.y)
+    rounded = lambda p: (round(p.x, 2), round(p.y, 2))
+    points_set = set()
+    output = []
+    for p in points:
+        if rounded(p) not in points_set:
+            output.append(coords(p))
+            points_set.add(rounded(p))
+    return output
+
+
 def counter_clockwise_contours(points):
     """Return a list of coordinates in counter_clockwise order from a list of Point3D"""
     _is_counter_clockwise = lambda contour: sum(
         [(p2.x - p1.x) * (p2.y + p1.y) for p1, p2 in zip(points, points[1:] + [points[0]])]) < 0
     if _is_counter_clockwise(points):
-        return points_to_coords(points)
+        return unique_points(points)
     else:
-        return points_to_coords(points[::-1])
+        return unique_points(points[::-1])
 
 
 def ground_material_from_business(material):
@@ -150,7 +163,8 @@ def add_material(ty_site, altimetry_site, material_border_points, is_mainsite):
                 datamodel.DEFAULT_MATERIAL = almaterial
                 continue
             else:
-                almatarea = build_material_area(cymarea, almaterial, material_border_points)
+                almatarea = build_material_area(
+                    cymarea, almaterial, material_border_points)
         else:
             almatarea = build_material_area(cymarea, almaterial)
         altimetry_site.add_child(almatarea)
@@ -209,7 +223,8 @@ class MeshBuilder(object):
         mesh = self._build_triangulation(alti)
         if refine:
             # Refine the mesh.
-            # TODO (optional) flood landtake in order to mark them as not to be refined
+            # TODO (optional) flood landtake in order to mark them as not to be
+            # refined
             mesh.refine_mesh(size_criterion=self.size_criterion,
                              shape_criterion=self.shape_criterion)
         self._compute_informations(mesh)
@@ -231,7 +246,8 @@ class MeshBuilder(object):
         try:
             shape = self._site.features_by_id[feature.id].shape
         except KeyError:
-            # The element was filtered out (e.g. it was outside of its sub-site)
+            # The element was filtered out (e.g. it was outside of its
+            # sub-site)
             return None
         vertices_groups = []
         for polyline in elementary_shapes(shape):
@@ -239,11 +255,13 @@ class MeshBuilder(object):
                 points = polyline.coords[:]
             elif isinstance(polyline, geometry.Polygon):
                 if list(polyline.interiors):
-                    raise ValueError("Polygons with holes are not (yet) supported")
+                    raise ValueError(
+                        "Polygons with holes are not (yet) supported")
                 points = polyline.exterior.coords[:]
                 # NB: polygons' coordinates sequences are automatically closed
             elif isinstance(polyline, geometry.Point):
-                warn('Found an isolated point in the altimetry features', RuntimeWarning)
+                warn('Found an isolated point in the altimetry features',
+                     RuntimeWarning)
                 continue
             else:
                 raise TypeError("Only level curves or waterbodies are expected, "
@@ -258,7 +276,7 @@ class MeshBuilder(object):
 
         The mesh is built by walking the equivalent site for level curves *only*.
         """
-        alti = ReferenceElevationMesh() # Altimetric base
+        alti = ReferenceElevationMesh()  # Altimetric base
         for level_curve in self._site.level_curves:
             props = level_curve.build_properties()
             assert 'altitude' in props
@@ -361,7 +379,7 @@ class MeshFiller(object):
                 continue
             point = self._mesh.point_for_face(fh)
             assert point is not None, \
-                    'could not find a point inside face handle {}'.format(fh)
+                'could not find a point inside face handle {}'.format(fh)
             point = geometry.Point((point.x(), point.y()))
             for feature in features:
                 if feature.shape.contains(point):
