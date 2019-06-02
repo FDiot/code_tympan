@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <cassert>
 #include<locale.h>
+#include<qregexp.h>
 
 #if TY_USE_IHM
 #include "Tympan/gui/widgets/TYSiteNodeWidget.h"
@@ -569,6 +570,28 @@ void TYSiteNode::loadTopoFile()
     absolute_pyscript_path.append(ALTIMETRY_PYSCRIPT);
     args << absolute_pyscript_path << current_project.fileName()
         << result_mesh.fileName();
+
+    // Altimetry parameters 
+    QString parameters = _pProjet->getCurrentCalcul()->solverParams;
+    QRegExp altimetry_size_criterion_reg("(MeshElementSizeMax=)([0-9]+.[0-9]*)");
+    int pos = altimetry_size_criterion_reg.indexIn(parameters);
+    if (pos > -1){
+        QString altimetry_size_criterion = altimetry_size_criterion_reg.cap(2);
+        args << altimetry_size_criterion;
+    }
+    QRegExp altimetry_refine_mesh_reg("(RefineMesh=)(True|False)");
+    QRegExp altimetry_use_volumes_landtakes_reg("(UseVolumesLandtake=)(True|False)");
+    pos = altimetry_refine_mesh_reg.indexIn(parameters);
+    if (pos > -1){
+        QString altimetry_refine_mesh = altimetry_refine_mesh_reg.cap(2);
+        args << altimetry_refine_mesh;
+    }
+    pos = altimetry_use_volumes_landtakes_reg.indexIn(parameters);
+    if (pos > -1){
+        QString altimetry_use_volumes_landtakes = altimetry_use_volumes_landtakes_reg.cap(2);
+        args << altimetry_use_volumes_landtakes;
+    }
+
     logger.info(
             "Lancement d'un sous-processus python pour calculer l'altimetrie avec le script: %s",
             absolute_pyscript_path.toStdString().c_str());

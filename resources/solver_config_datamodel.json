@@ -218,6 +218,16 @@
       "type": "float", 
       "help": "Altimetry refinement parameter"
     }, 
+     "UseVolumesLandtake": {
+      "default": false, 
+      "type": "bool", 
+      "help": "Altimetry refinement parameter"
+    }, 
+     "RefineMesh": {
+      "default": true, 
+      "type": "bool", 
+      "help": "Altimetry refinement parameter"
+    }, 
     "showScene": {
       "default": false, 
       "type": "bool", 

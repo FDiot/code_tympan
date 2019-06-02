@@ -53,6 +53,9 @@ SolverConfiguration::SolverConfiguration()
     DiffractionUseDistanceAsFilter = true;
     KeepDebugRay = false;
     UsePostFilters = true;
+    MeshElementSizeMax = 0.0;   //!< Not used
+    RefineMesh = true;
+    UseVolumesLandtake = false;
 
     //EnableFullTargets = false;
     //TargetsDensity = 0.1f;

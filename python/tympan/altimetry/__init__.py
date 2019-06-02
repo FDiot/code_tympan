@@ -25,8 +25,8 @@ It is devided in several modules:
 """
 
 
-
-import sys, os
+import sys
+import os
 import os.path as osp
 
 from ._export import export_to_ply
@@ -46,7 +46,7 @@ except ImportError:
 
     if CGAL_BINDINGS_PATH is None or not osp.isdir(CGAL_BINDINGS_PATH):
         raise ImportError("A `CGAL_BINDINGS_PATH` environment variable is expected"
-                           " to point to the directory holding cgal-bindings binary modules")
+                          " to point to the directory holding cgal-bindings binary modules")
     try:
         # Adjusting sys.path in order to find modules shipped with Code_TYMPAN
         sys.path.append(CGAL_BINDINGS_PATH)
@@ -68,13 +68,15 @@ class AltimetryMesh(object):
         self._material_by_face = None
 
     @classmethod
-    def from_site(cls, site, **kwargs):
+    def from_site(cls, site, use_vol_landtakes=False, **kwargs):
         """Build an altimetry mesh from a tympan Site.
 
         Extra keyword arguments are passed to the mesh builder (see
         tympan.altimetry.builder.build_altimetry).
         """
-        asite = builder.build_sitenode(site)
+
+        asite = builder.build_sitenode(
+            site, use_vol_landtakes=use_vol_landtakes)
         # Compute altimetry and retrieve the resulting mesh
         merged_site, mesh, feature_by_face = builder.build_altimetry(
             asite, **kwargs)

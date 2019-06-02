@@ -7,24 +7,24 @@ from libcpp.vector cimport vector
 from libcpp.deque cimport deque
 
 from tympan._core cimport SolverInterface
-from tympan.models._common cimport (OPoint3D, OSpectre, OSpectreComplex,
-                                    OVector3D, SpectrumMatrix, acoustic_path)
+from tympan.models._common cimport(OPoint3D, OSpectre, OSpectreComplex,
+                                   OVector3D, SpectrumMatrix, acoustic_path)
 
 # XXX importing SmartPtr and shared_ptr from tympan.core set a cyclical dependency
 # between tympan.core and tympan.models.solver, since tympan.core declares
 # SolverInterface::solve() which takes the solver model as a parameter.
 cdef extern from "boost/shared_ptr.hpp" namespace "boost":
     cdef cppclass shared_ptr[T]:
-        shared_ptr(T*)
+        shared_ptr(T *)
         shared_ptr()
-        T *get()
+        T * get()
 
 cdef extern from "Tympan/core/smartptr.h":
     cdef cppclass SmartPtr[T]:
         SmartPtr()
-        SmartPtr(T*)
-        T* getRealPointer()
-        T* _pObj
+        SmartPtr(T *)
+        T * getRealPointer()
+        T * _pObj
 
 cdef class ProblemModel:
     cdef shared_ptr[AcousticProblemModel] thisptr
@@ -33,14 +33,14 @@ cdef class ResultModel:
     cdef shared_ptr[AcousticResultModel] thisptr
 
 cdef class Solver:
-    cdef SolverInterface* thisptr
+    cdef SolverInterface * thisptr
 
 cdef class Directivity:
-    cdef SourceDirectivityInterface* thisptr
+    cdef SourceDirectivityInterface * thisptr
 
 cdef extern from "Tympan/models/solver/acoustic_problem_model.hpp" namespace "tympan":
 
-    deque[size_t] scene_volume_intersection(deque[AcousticTriangle]& triangles, deque[OPoint3D]& nodes,
+    deque[size_t] scene_volume_intersection(deque[AcousticTriangle] & triangles, deque[OPoint3D] & nodes,
                                             float l, float h, OPoint3D source, OPoint3D receptor)
 
     cdef cppclass AcousticProblemModel:
@@ -49,23 +49,23 @@ cdef extern from "Tympan/models/solver/acoustic_problem_model.hpp" namespace "ty
         size_t nmaterials()
         size_t nsources()
         size_t nreceptors()
-        const deque[AcousticTriangle]& triangles()
-        const deque[OPoint3D]& nodes()
-        AcousticTriangle &triangle(size_t tri_idx)
-        AcousticSource& source(size_t idx)
-        AcousticReceptor& receptor(size_t idx)
-        OPoint3D& node(size_t idx)
-        shared_ptr[AcousticMaterialBase] make_material(const string& name, double resistivity, double deviation, double length)
-        shared_ptr[AcousticMaterialBase] make_material(const string& name, const OSpectreComplex& spectrum)
+        const deque[AcousticTriangle] & triangles()
+        const deque[OPoint3D] & nodes()
+        AcousticTriangle & triangle(size_t tri_idx)
+        AcousticSource & source(size_t idx)
+        AcousticReceptor & receptor(size_t idx)
+        OPoint3D & node(size_t idx)
+        shared_ptr[AcousticMaterialBase] make_material(const string & name, double resistivity, double deviation, double length)
+        shared_ptr[AcousticMaterialBase] make_material(const string & name, const OSpectreComplex & spectrum)
         size_t make_triangle(size_t n1, size_t n2, size_t n3)
-        size_t make_node(const OPoint3D&)
-        size_t make_source(const OPoint3D& point_, const OSpectre& spectrum_, const SourceDirectivityInterface* directivity_)
-        size_t make_receptor(const OPoint3D& point_)
+        size_t make_node(const OPoint3D &)
+        size_t make_source(const OPoint3D & point_, const OSpectre & spectrum_, const SourceDirectivityInterface * directivity_)
+        size_t make_receptor(const OPoint3D & point_)
 
 cdef extern from "Tympan/models/solver/acoustic_result_model.hpp" namespace "tympan":
     cdef cppclass AcousticResultModel:
-        SpectrumMatrix& get_data()
-        vector[acoustic_path*]& get_path_data()
+        SpectrumMatrix & get_data()
+        vector[acoustic_path * ] & get_path_data()
 
 cdef extern from "Tympan/models/solver/data_model_common.hpp":
     cdef cppclass BaseEntity:
@@ -75,7 +75,7 @@ cdef extern from "Tympan/models/solver/entities.hpp" namespace "tympan":
     cdef cppclass AcousticSource(BaseEntity):
         OPoint3D position
         OSpectre spectrum
-        SourceDirectivityInterface* directivity
+        SourceDirectivityInterface * directivity
         string volume_id
         string face_id
 
@@ -91,10 +91,10 @@ cdef extern from "Tympan/models/solver/entities.hpp" namespace "tympan":
         string name
 
     cdef cppclass AcousticBuildingMaterial(AcousticMaterialBase):
-        AcousticBuildingMaterial(const string& name_, const OSpectreComplex& spectrum)
+        AcousticBuildingMaterial(const string & name_, const OSpectreComplex & spectrum)
 
     cdef cppclass AcousticGroundMaterial(AcousticMaterialBase):
-        AcousticGroundMaterial(const string& name_, double resistivity_)
+        AcousticGroundMaterial(const string & name_, double resistivity_)
 
     cdef cppclass SourceDirectivityInterface:
         pass
@@ -103,20 +103,20 @@ cdef extern from "Tympan/models/solver/entities.hpp" namespace "tympan":
         SphericalSourceDirectivity()
 
     cdef cppclass CommonFaceDirectivity(BaseEntity, SourceDirectivityInterface):
-        CommonFaceDirectivity() # XXX
-        CommonFaceDirectivity(const OVector3D& support_normal_, double support_size_)
+        CommonFaceDirectivity()  # XXX
+        CommonFaceDirectivity(const OVector3D & support_normal_, double support_size_)
         OVector3D get_normal()
 
     cdef cppclass VolumeFaceDirectivity(CommonFaceDirectivity):
-        VolumeFaceDirectivity(const OVector3D& support_normal_, double support_size_)
+        VolumeFaceDirectivity(const OVector3D & support_normal_, double support_size_)
 
     cdef cppclass ChimneyFaceDirectivity(CommonFaceDirectivity):
-        ChimneyFaceDirectivity(const OVector3D& support_normal_, double support_size_)
+        ChimneyFaceDirectivity(const OVector3D & support_normal_, double support_size_)
 
     cdef cppclass BaffledFaceDirectivity(CommonFaceDirectivity):
-        BaffledFaceDirectivity(const OVector3D& support_normal_, double support_size_)
+        BaffledFaceDirectivity(const OVector3D & support_normal_, double support_size_)
 
-    CommonFaceDirectivity* dynamic_cast_commonface_dir "dynamic_cast<tympan::CommonFaceDirectivity*>"(SourceDirectivityInterface *)
+    CommonFaceDirectivity * dynamic_cast_commonface_dir "dynamic_cast<tympan::CommonFaceDirectivity*>"(SourceDirectivityInterface *)
 
 cdef extern from "Tympan/models/solver/config.h" namespace "tympan::SolverConfiguration":
     SmartPtr[SolverConfiguration] get()
@@ -171,6 +171,8 @@ cdef extern from "Tympan/models/solver/config.h" namespace "tympan":
         double AnalyticGradV
         float MinSRDistance
         float MeshElementSizeMax
+        bool RefineMesh
+        bool UseVolumesLandtake
         bool showScene
         int AnalyticTypeTransfo
         bool DebugUseDiffractionPathSelector
