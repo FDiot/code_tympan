@@ -30,7 +30,7 @@
 TYAcousticModel::TYAcousticModel(TYSolver& solver)
     : _useSol(true),
       _useReflex(false),
-      _conditionFav(false),
+      _propaCond(0),
       _interference(false),
       _paramH(10.0),
       _solver(solver)
@@ -52,7 +52,7 @@ void TYAcousticModel::init()
     // Calcul avec reflexion sur les parois verticales
     _useReflex = config->UseReflection;
     // Calcul en conditions favorables
-    _conditionFav = config->PropaConditions;
+    _propaCond = config->PropaConditions;
     // Definit l'atmosphere courante du site
     double pression = config->AtmosPressure;
     double temperature = config->AtmosTemperature;
@@ -77,6 +77,29 @@ void TYAcousticModel::compute(  const std::deque<TYSIntersection>& tabIntersect,
     // Construction du rayon SR
     OSegment3D rayon;
     trajet.getPtSetPtRfromOSeg3D(rayon);
+    bool conditionFav = false;
+
+    // Calcul des conditions de propagation suivant la direction du vent 
+    tympan::LPSolverConfiguration config = tympan::SolverConfiguration::get();
+    assert(config->DSWindDirection >= 0 && config->DSWindDirection <= 360);
+
+    double windRadian = DEGTORAD(config->DSWindDirection);
+    OVector3D windDirection = OVector3D(-sin(windRadian), -cos(windRadian), 0);
+    OVector3D propaDirection = rayon.toVector3D();
+    propaDirection._z = 0;
+    double angle = RADTODEG(acos(windDirection.dot(propaDirection)/(windDirection.norme()*propaDirection.norme())));//Angle always between 0-180
+    assert(180 >= angle >= 0);
+    assert(180 >= config->AngleFavorable >= 0);
+    
+    if (angle  <= config->AngleFavorable) 
+    {
+        conditionFav = true;
+    }
+    else
+    {
+        conditionFav = false;
+    }
+    
 
     // Recuperation de la source
     tympan::AcousticSource& source = trajet.asrc;
@@ -88,17 +111,17 @@ void TYAcousticModel::compute(  const std::deque<TYSIntersection>& tabIntersect,
 
     // Calcul des parcours lateraux
     // 1. Vertical
-    computeCheminsAvecEcran(rayon, source, ptsTop, vertical, tabChemins, distance);
+    computeCheminsAvecEcran(rayon, source, ptsTop, vertical, tabChemins, distance, conditionFav);
 
     // 2. Horizontal gauche
-    computeCheminsAvecEcran(rayon, source, ptsLeft, horizontal, tabChemins, distance);
+    computeCheminsAvecEcran(rayon, source, ptsLeft, horizontal, tabChemins, distance, conditionFav);
 
     // 3. Horizontal droite
-    computeCheminsAvecEcran(rayon, source, ptsRight, horizontal, tabChemins, distance);
+    computeCheminsAvecEcran(rayon, source, ptsRight, horizontal, tabChemins, distance, conditionFav);
 
     if (tabChemins.size() == 0)
     {
-        computeCheminSansEcran(rayon, source, tabChemins, distance);
+        computeCheminSansEcran(rayon, source, tabChemins, distance, conditionFav);
     }
 
     // Calcul des reflexions si necessaire
@@ -208,7 +231,7 @@ void TYAcousticModel::computeCheminAPlat(const OSegment3D& rayon, const tympan::
     tabEtapes.clear(); // Vide le tableau des etapes
 }
 
-void TYAcousticModel::computeCheminSansEcran(const OSegment3D& rayon, const tympan::AcousticSource& source, TYTabChemin& TabChemin, double distance) const
+void TYAcousticModel::computeCheminSansEcran(const OSegment3D& rayon, const tympan::AcousticSource& source, TYTabChemin& TabChemin, double distance, bool conditionFav) const
 {
     /*
         LE CALCUL POUR UN TRAJET SANS OBSTACLE COMPORTE UN CHEMIN DIRECT
@@ -254,7 +277,7 @@ void TYAcousticModel::computeCheminSansEcran(const OSegment3D& rayon, const tymp
     // on s'assure que les reflexions n'iront pas se faire au dela de la source et
     // du recepteur
 
-    if (_conditionFav)
+    if ((_propaCond==1) || (_propaCond == 2 && conditionFav))
     {
         OPoint3D ptProj;
 		int res;
@@ -414,7 +437,7 @@ void TYAcousticModel::computeCheminSansEcran(const OSegment3D& rayon, const tymp
 }
 
 
-bool TYAcousticModel::computeCheminsAvecEcran(const OSegment3D& rayon, const tympan::AcousticSource& source, const TabPoint3D& pts, const bool vertical, TYTabChemin& TabChemins, double distance) const
+bool TYAcousticModel::computeCheminsAvecEcran(const OSegment3D& rayon, const tympan::AcousticSource& source, const TabPoint3D& pts, const bool vertical, TYTabChemin& TabChemins, double distance, bool conditionFav) const
 {
     /* ============================================================================================================
         07/03/2005 : Suppression du calcul ddes pentes moyennes avant et apres l'obstacle.
@@ -526,22 +549,22 @@ bool TYAcousticModel::computeCheminsAvecEcran(const OSegment3D& rayon, const tym
     Etape._Absorption = _absoNulle;
 
     //      4.1. Chemin sans reflexion
-    Diff = calculAttDiffraction(rayon, penteMoyenneTotale, false, longNoReflex, epaisseur, vertical, false, bDiffOk);
+    Diff = calculAttDiffraction(rayon, penteMoyenneTotale, false, longNoReflex, epaisseur, vertical, false, bDiffOk, conditionFav);
     Etape._Attenuation = Diff;
     tabNoReflex.push_back(Etape);
 
     //      4.2. Chemin 2 reflexions
-    Diff = calculAttDiffraction(rayon, penteMoyenneTotale, false, longTwoReflex, epaisseur, vertical, false, bDiffOk);
+    Diff = calculAttDiffraction(rayon, penteMoyenneTotale, false, longTwoReflex, epaisseur, vertical, false, bDiffOk, conditionFav);
     Etape._Attenuation = Diff;
     tabTwoReflex.push_back(Etape);
 
     //      4.3. Chemin une reflexion avant
-    Diff = calculAttDiffraction(rayon, penteMoyenneTotale, true, longOneReflexBefore, epaisseur, vertical, false, bDiffOk);
+    Diff = calculAttDiffraction(rayon, penteMoyenneTotale, true, longOneReflexBefore, epaisseur, vertical, false, bDiffOk, conditionFav);
     Etape._Attenuation = Diff;
     tabOneReflexBefore.push_back(Etape);
 
     //      4.4. Chemin une reflexion apres
-    Diff = calculAttDiffraction(rayon, penteMoyenneTotale, true, longOneReflexAfter, epaisseur, vertical, true, bDiffOk);
+    Diff = calculAttDiffraction(rayon, penteMoyenneTotale, true, longOneReflexAfter, epaisseur, vertical, true, bDiffOk,conditionFav);
     Etape._Attenuation = Diff;
     tabOneReflexAfter.push_back(Etape);
 
@@ -926,7 +949,7 @@ OSpectre TYAcousticModel::calculC(const double& epaisseur) const
     return C;
 }
 
-OSpectre TYAcousticModel::calculAttDiffraction(const OSegment3D& rayon, const OSegment3D& penteMoyenne, const bool& miroir, const double& re, const double& epaisseur, const bool& vertical, const bool& avantApres, bool& bDiffOk) const
+OSpectre TYAcousticModel::calculAttDiffraction(const OSegment3D& rayon, const OSegment3D& penteMoyenne, const bool& miroir, const double& re, const double& epaisseur, const bool& vertical, const bool& avantApres, bool& bDiffOk, bool conditionFav) const
 {
     double rd;
 
@@ -975,7 +998,7 @@ OSpectre TYAcousticModel::calculAttDiffraction(const OSegment3D& rayon, const OS
     }
 
     // Dans le cas du calcul en conditions favorables on considere un trajet direct courbe
-    if ((_conditionFav) && (vertical))
+    if ((((_propaCond==1) || (_propaCond == 2 && conditionFav))) && (vertical))
     {
         double gamma = rd * 8.0;
         gamma = (gamma > 1000 ? gamma : 1000.0);// Rayon minimum 1000 metres

@@ -11,9 +11,24 @@
       "help": "Energetic (p\u00b2 summation) or interference (p summation)"
     }, 
     "PropaConditions": {
-      "default": false, 
-      "type": "bool", 
-      "help": "Propagation conditions (non refracting / downward conditions (ISO 9613))"
+      "default": 0, 
+      "type": "int", 
+      "help": "Propagation conditions ( 0 : non refracting | 1 : downward conditions (ISO 9613) | 2 : mixed conditions depending on the wind direction)"
+    }, 
+    "DSWindDirection": {
+      "default": 0, 
+      "type": "float", 
+      "help": "Wind direction in degrees [0-360] : 0 is from north to south | 90 is from east to ouest"
+    }, 
+    "AngleFavorable": {
+      "default": 45, 
+      "type": "float", 
+      "help": "Downward conditions half span angle in degrees [0-180]"
+    }, 
+    "AngleFavorable": {
+      "default": 45, 
+      "type": "float", 
+      "help": "Upward refracting half span angle in degrees [0-180 : Unused for now]"
     }, 
     "UseLateralDiffraction": {
       "default": true, 

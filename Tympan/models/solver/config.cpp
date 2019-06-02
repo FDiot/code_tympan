@@ -73,7 +73,12 @@ SolverConfiguration::SolverConfiguration()
     UseRealGround = true;
     UseLateralDiffraction = true;
     UseReflection = true;
-    PropaConditions = true;
+
+    PropaConditions = 0;
+    DSWindDirection = 0;
+    AngleFavorable = 45;
+    AngleDefavorable = 45;
+
     H1parameter = 10.;
     ModSummation = false;
 

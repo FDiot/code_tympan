@@ -150,7 +150,10 @@ cdef extern from "Tympan/models/solver/config.h" namespace "tympan":
         bool UseLateralDiffraction
         bool UseRealGround
         int NbThreads
-        bool PropaConditions
+        int PropaConditions
+        float DSWindDirection
+        float AngleFavorable
+        float AngleDefavorable
         bool UseReflection
         bool UseScreen
         float H1parameter

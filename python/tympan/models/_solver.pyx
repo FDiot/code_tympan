@@ -607,6 +607,27 @@ cdef class Configuration:
         self.thisptr.getRealPointer().PropaConditions = value
     PropaConditions = property(getPropaConditions, setPropaConditions)
 
+    def getDSWindDirection(self):
+        return self.thisptr.getRealPointer().DSWindDirection
+
+    def setDSWindDirection(self, value):
+        self.thisptr.getRealPointer().DSWindDirection = value
+    DSWindDirection = property(getDSWindDirection, setDSWindDirection)
+
+    def getAngleFavorable(self):
+        return self.thisptr.getRealPointer().AngleFavorable
+
+    def setAngleFavorable(self, value):
+        self.thisptr.getRealPointer().AngleFavorable = value
+    AngleFavorable = property(getAngleFavorable, setAngleFavorable)
+
+    def getAngleDefavorable(self):
+        return self.thisptr.getRealPointer().AngleDefavorable
+
+    def setAngleDefavorable(self, value):
+        self.thisptr.getRealPointer().AngleDefavorable = value
+    AngleDefavorable = property(getAngleDefavorable, setAngleDefavorable)
+
     def getUseReflection(self):
         return self.thisptr.getRealPointer().UseReflection
 
