@@ -76,7 +76,7 @@ def build_material_area(ty_materialarea, altimetry_groundmaterial, landtake_poin
                    id=ty_materialarea.elem_id, **kwargs)
 
 
-def build_sitenode(ty_site, mainsite=True):
+def build_sitenode(ty_site, mainsite=True, use_vol_landtakes=False):
     """Build an altimetry SiteNode from a Tympan topography site `ty_site`.
 
     If `mainsite` is True the site is assumed to be the parent possibly
@@ -118,11 +118,13 @@ def build_sitenode(ty_site, mainsite=True):
             altitude=cylcurve.altitude,
             id=cylcurve.elem_id)
         altimetry_site.add_child(alcurve)
-    # Ground contour (infrastructure landtake)
-    for id_, volume_contours in ty_site.ground_contour.items():
-        contours_coords = map(counter_clockwise_contours, volume_contours)
-        altimetry_site.add_child(
-            InfrastructureLandtake(*contours_coords, id=id_))
+
+    if use_vol_landtakes:
+        # Ground contour (infrastructure landtake)
+        for id_, volume_contours in ty_site.ground_contour.items():
+            contours_coords = map(counter_clockwise_contours, volume_contours)
+            altimetry_site.add_child(
+                InfrastructureLandtake(*contours_coords, id=id_))
     # Recurse
     cysubsites = ty_site.subsites
     for cysbsite in cysubsites:
@@ -172,13 +174,13 @@ def add_material(ty_site, altimetry_site, material_border_points, is_mainsite):
 
 # Altimetry mesh building utilities.
 def build_altimetry(mainsite, allow_features_outside_mainsite=True,
-                    size_criterion=0.0):
+                    size_criterion=0.0, refine_mesh=True):
     """Return the results of altimetry building from a site tree model."""
     cleaner = recursively_merge_all_subsites(
         mainsite, allow_outside=allow_features_outside_mainsite)
     merged_site = cleaner.merged_site()
     builder = MeshBuilder(merged_site, size_criterion=size_criterion)
-    mesh = builder.build_mesh()
+    mesh = builder.build_mesh(refine=refine_mesh)
     filler = MeshFiller(mesh, builder.vertices_for_feature)
     feature_by_face = filler.fill_material_and_landtakes(merged_site, cleaner)
     builder.join_with_landtakes(mesh)

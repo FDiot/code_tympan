@@ -63,6 +63,8 @@ public:
 
     int AnalyticTypeTransfo;	//!< Type of geometry modifier used (only one for the moment: geometry_modifier_z_correction)
     float MeshElementSizeMax;	//!< Not used
+    bool RefineMesh;
+    bool UseVolumesLandtake;
     bool showScene;				//!< Flag to export Scene in order to visualize it
 
     float MinSRDistance;		//!< Not used
