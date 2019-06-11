@@ -141,9 +141,9 @@ bool TYCalculManager::launch(LPTYCalcul pCalcul)
 
     // Altimetry parameters 
     QString parameters = pCalcul->solverParams;
-    QRegExp altimetry_size_criterion_reg("(MeshElementSizeMax\s?=\s?)([0-9]+.[0-9]*)");
-    QRegExp altimetry_refine_mesh_reg("(RefineMesh\s?=\s?)(True|False)");
-    QRegExp altimetry_use_volumes_landtakes_reg("(UseVolumesLandtake\s?=\s?)(True|False)");
+    QRegExp altimetry_size_criterion_reg("(MeshElementSizeMax\\s?=\\s?)([0-9]+.[0-9]*)");
+    QRegExp altimetry_refine_mesh_reg("(RefineMesh\\s?=\\s?)(True|False)");
+    QRegExp altimetry_use_volumes_landtakes_reg("(UseVolumesLandtake\\s?=\\s?)(True|False)");
     int pos = altimetry_size_criterion_reg.indexIn(parameters);
     if (pos > -1){
         QString altimetry_size_criterion = altimetry_size_criterion_reg.cap(2);
