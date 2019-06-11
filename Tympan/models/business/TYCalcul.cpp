@@ -338,7 +338,20 @@ int TYCalcul::fromXML(DOM_Element domElement)
         TYXMLTools::getElementStringValue(elemCur, "solverId", strSolverId, getOk[5]);
         TYXMLTools::getElementIntValue(elemCur, "etat", etat, getOk[6]);
         TYXMLTools::getElementStringValue(elemCur, "solverParams", solverParams, getOk[7]);
-
+        
+        // Gestion de la compatibilité avec la version 4.1 de Code_TYMPAN
+        if (elemCur.nodeName() == "solverParams")
+        {
+            QRegExp propaCond_reg("(PropaConditions\\s?=\\s?)(True|False)");
+            int pos = propaCond_reg.indexIn(solverParams);
+            if (pos > -1)
+            {
+                QString propaConditions = propaCond_reg.cap(2);
+                int value;
+                (propaConditions == "True") ? value = 1 : value = 0;
+                solverParams.replace(propaCond_reg, "PropaConditions=" + QString::number(value));
+            }
+        }
         // Gestion de la compatibilité avec la version 3 de Code_TYMPAN
         TYXMLTools::getElementBoolValue(elemCur, "useSol", useSol, getOk[8]);
         TYXMLTools::getElementBoolValue(elemCur, "useEcran", useEcran, getOk[9]);
@@ -352,13 +365,14 @@ int TYCalcul::fromXML(DOM_Element domElement)
         if (elemCur.nodeName() == "distanceSRMin")
         {
             // Conversion des boolean recuperes en string 
-            QString useSol_str, useEcran_str, useReflexion_str, interference_str, calculTrajetHorizontaux_str, condFav_str;
+            QString useSol_str, useEcran_str, useReflexion_str, interference_str, calculTrajetHorizontaux_str;
+            int condPropa;
             useSol ? useSol_str = "True": useSol_str = "False";
             useEcran ? useEcran_str = "True": useEcran_str = "False";
             useReflexion ? useReflexion_str = "True": useReflexion_str = "False";
             interference ? interference_str = "True": interference_str = "False";
             calculTrajetHorizontaux ? calculTrajetHorizontaux_str = "True" : calculTrajetHorizontaux_str = "False";
-            condFav ? condFav_str = "True" : condFav_str = "False";
+            condFav ? condPropa = 1 : condPropa = 0;
 
             // Creation des lignes a modifier dans le bloc de text de parametres
             QString useRealGround = "UseRealGround=" + useSol_str;
@@ -366,14 +380,14 @@ int TYCalcul::fromXML(DOM_Element domElement)
             QString useReflection = "UseReflection=" + useReflexion_str;
             QString modSummation = "ModSummation=" + interference_str;
             QString useLateralDiffraction = "UseLateraDiffraction=" + calculTrajetHorizontaux_str;
-            QString propaConditions = "PropaConditions=" + condFav_str;
+            QString propaConditions = "PropaConditions=" + QString::number(condPropa);
             QString h1parameter = "H1parameter=" + QString::number(h1);
             QString minSRDistance = "MinSRDistance=" + QString::number(distanceSRMin);
 
             // Expressions regulières liées aux lignes recherchées
             QRegExp useSol_reg("UseRealGround=(True|False)"), useEcran_reg("UseScreen=(True|False)"),
                 useReflexion_reg("UseReflection=(True|False)"),interference_reg("ModSummation=(True|False)"),
-                calculTrajetHorizontaux_reg("UseLateraDiffraction=(True|False)"),condFav_reg("PropaConditions=(True|False)"),
+                calculTrajetHorizontaux_reg("UseLateraDiffraction=(True|False)"),condFav_reg("PropaConditions=[0-2]"),
                 h1parameter_reg("H1parameter=[0-9]+.[0-9]*"),minSRDistance_reg("MinSRDistance=[0-9]+.[0-9]*");
 
             // Rechercher et remplacer
