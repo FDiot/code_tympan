@@ -1436,22 +1436,6 @@ bool TYPositionEditor::move(OPoint3D* pPt, bool enableX /*=true*/, bool enableY 
     // Si le deplacement n'est pas nul
     if (ptBis != *pPt)
     {
-        // Calcul de la nouvelle hauteur par rapport au sol DT++ 20060322
-        // Sauf a se compliquer la vie, ca ne marchera pas si l'altimetrie n'a pas ete calculee
-        if (QString(_pModeler->metaObject()->className()).compare("TYSiteModelerFrame") == 0)
-        {
-            if (_pEditGeoNode)
-            {
-                H = ptBis._z - pPt->_z + _pEditGeoNode->getHauteur();
-                _pEditGeoNode->setHauteur(H);
-            }
-            else
-            {
-                H = ptBis._z - pPt->_z;
-                pPt->_z = H;
-            }
-        }
-
         // On applique le deplacement
         if (enableX) { pPt->_x = ptBis._x; }
         if (enableY) { pPt->_y = ptBis._y; }

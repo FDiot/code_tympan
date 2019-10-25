@@ -12,6 +12,7 @@ from shapely.geometry import Point, LineString
 from CGAL.CGAL_Kernel import (
     Point_2,
     Segment_2 as Segment,
+    Vector_2,
     Point_3,
     Vector_3,
     Triangle_3,
@@ -392,13 +393,17 @@ class MeshedCDTWithInfo(object):
     def iter_edges_for_input_constraint(self, va, vb):
         # CAUTION the CGAL method vertices_in_constraint does NOT
         # always return the vertices in the order from va to vb
-        constraint_direction = Segment(va.point(), vb.point()).direction()
+        vector_direction = Vector_2(va.point(), vb.point())
+
         def same_direction_as_constraint(v0, v1):
-            s = Segment(v0.point(), v1.point())
-            if s.direction() == constraint_direction:
+            s = Vector_2(v0.point(), v1.point())
+            if s * vector_direction > 0:
                 return (v0, v1)
-            else:
+            elif s * vector_direction < 0:
                 return (v1, v0)
+            else:
+                raise ValueError("These two vectors are orthogonal ({va}, {vb}) and ({v0}, {v1}])".format(
+                    va=va.point(), vb=vb.point(), v0=v0.point(), v1=v1.point()))
         for v0, v1 in ilinks(self.cdt.vertices_in_constraint(va, vb)):
             yield same_direction_as_constraint(v0, v1)
 
@@ -761,7 +766,7 @@ class ElevationMesh(MeshedCDTWithInfo):
                     # before entering this method ?
                     info.altitude = 0
 
-    def flood_polygon(self, flooder_class, vertices, flood_right=False, close_it=False):
+    def flood_polygon(self, flooder_class, vertices, flood_right=False, close_it=True):
         """Flood the inside of a polygon given by its vertices list using the
         specified class of Flooder.
 
@@ -772,7 +777,7 @@ class ElevationMesh(MeshedCDTWithInfo):
 
         """
         faces_left, faces_right = left_and_right_faces(
-            self.iter_faces_for_input_polyline(vertices, close_it=True))
+            self.iter_faces_for_input_polyline(vertices, close_it))
         seed_faces = faces_right if flood_right else faces_left
         flooder = flooder_class(self)
         flooder.flood_from(seed_faces)

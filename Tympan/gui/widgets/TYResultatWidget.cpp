@@ -190,6 +190,7 @@ TYResultatWidget::TYResultatWidget(TYResultat* pElement, QWidget* _pParent /*=NU
 
     // Permettre le tri en cliquant sur le haut d'une colonne
     QHeaderView* entetesRecepteurs = _pTable->horizontalHeader(); // On recupere un pointeur sur les entetes horizontales
+    entetesRecepteurs->setResizeMode(QHeaderView::ResizeToContents);
     QObject::connect(entetesRecepteurs, SIGNAL(sectionClicked(int)), this, SLOT(sortCol(int)));
 
     QObject::connect(_pContributionLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotContributionLineEditChanged()));

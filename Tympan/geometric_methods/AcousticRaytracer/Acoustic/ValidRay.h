@@ -65,7 +65,7 @@ bool pathDiffValidationForReflection(Ray * r, const vec3& impact);
 void computeCumulDistance(Ray *r, const vec3& impact);
 
 #ifdef _ALLOW_TARGETING_
-void appendDirectionToEvent(std::shared_ptr<Event> e, TargetManager& targets);
+void appendDirectionToEvent(boost::shared_ptr<Event> e, TargetManager& targets);
 #endif //_ALLOW_TARGETING_
 };
 

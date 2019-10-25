@@ -40,7 +40,7 @@ public :
 
     virtual SELECTOR_RESPOND canBeInserted(T* r, unsigned long long& replace)
     {
-        vector<std::shared_ptr<Event> >* events = r->getEvents();
+        vector<boost::shared_ptr<Event> >* events = r->getEvents();
 
         //The ray has is accepted if it has no diffraction event
         if ( (events->size() == 0) || (r->getDiff() == 0) ) { return SELECTOR_ACCEPT; }
@@ -52,7 +52,7 @@ public :
 
 		decimal F1 = 0., F2 = 0., T1 = 0., T2 = 0., FT = 0.;
 
-		vector<std::shared_ptr<Event> >::iterator iter = events->begin();
+		vector<boost::shared_ptr<Event> >::iterator iter = events->begin();
 		do
 		{
 			if ( (*iter)->getType() != DIFFRACTION ) 
@@ -125,7 +125,7 @@ public :
 
     virtual bool insertWithTest(T* r)
     {
-        vector<std::shared_ptr<Event> >* events = r->getEvents();
+        vector<boost::shared_ptr<Event> >* events = r->getEvents();
 
         if ( (events->size() == 0) || (r->getDiff() == 0) ) { return true; }
 		
@@ -136,7 +136,7 @@ public :
 
 		decimal F1 = 0., F2 = 0., T1 = 0., T2 = 0., FT = 0.;
 
-		vector<std::shared_ptr<Event> >::iterator iter = events->begin();
+		vector<boost::shared_ptr<Event> >::iterator iter = events->begin();
 		do
 		{
 			if ( (*iter)->getType() != DIFFRACTION ) 

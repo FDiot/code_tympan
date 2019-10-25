@@ -17,6 +17,7 @@
 #define RAY_H
 
 #include <memory>
+#include <boost/shared_ptr.hpp>
 
 #include "Base.h"
 #include "Geometry/mathlib.h"
@@ -113,7 +114,6 @@ public:
      * \param closestPoint
      */
 	decimal computeTrueLength(const vec3& ref, const vec3& lastPos, vec3& closestPoint);
-
     /*!
      * \fn decimal computePertinentLength(const vec3& ref, const vec3& lastPos, vec3& closestPoint);
      * \brief Compute ray length from last pertinent event (i.e. source or last diffraction)
@@ -173,18 +173,18 @@ public:
     unsigned int getNbEvents() const { return nbDiffraction + nbReflexion; }
 
     /*!
-    * \fn std::vector<std::shared_ptr<Event> >* getEvents()
+    * \fn std::vector<boost::shared_ptr<Event> >* getEvents()
     * \brief Return the events array encountered by the ray
     * \return Events array encountered by the ray.
     */
-    std::vector<std::shared_ptr<Event> >* getEvents() { return &events; }
+    std::vector<boost::shared_ptr<Event> >* getEvents() { return &events; }
 
     /*!
-    * \fn const std::vector<std::shared_ptr<Event> >* getEvents() const
+    * \fn const std::vector<boost::shared_ptr<Event> >* getEvents() const
     * \brief Return the events array encountered by the ray
     * \return Events array encountered by the ray.
     */
-    const std::vector<std::shared_ptr<Event> >* getEvents() const { return &events; }
+    const std::vector<boost::shared_ptr<Event> >* getEvents() const { return &events; }
 
     /**
      * \fn getFaceHistory()
@@ -430,7 +430,7 @@ public:
      * \brief set the cumulative walking step difference by the ray computed at each step
      */
 
-     void addEvent (std::shared_ptr<Event> _event){
+     void addEvent (boost::shared_ptr<Event> _event){
         events.push_back(_event);
      }
 
@@ -450,7 +450,7 @@ protected:
     unsigned int nbDiffraction;                 //!< Diffractions number for the ray
     decimal cumulDistance;                      //!< Cumulative length since last valid reflexion
     decimal cumulDelta;                         //!< Cumulative difference by the ray computed at each step
-    std::vector<std::shared_ptr<Event>> events; //!< Events list for the ray
+    std::vector<boost::shared_ptr<Event>> events; //!< Events list for the ray
 
 };
 

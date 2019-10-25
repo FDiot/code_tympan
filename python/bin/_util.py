@@ -353,6 +353,31 @@ def compare_xml_results(result_xml, reference_xml, testobj):
     compare_project_results(project, expected_project, testobj)
 
 
+def compare_xml_meshes_results(result_xml, reference_xml, testobj):
+    """
+    Compares the result in meshes 
+    """
+    project = Project.from_xml(result_xml)
+    expected_project = Project.from_xml(reference_xml)
+
+    testobj.assertEqual(len(project.meshes), len(
+        expected_project.meshes), 'The two projects must have only one mesh each')
+    testobj.assertEqual(len(project.meshes[0].receptors), len(expected_project.meshes[0].receptors),
+                        'The two projects must have meshes with the same number of receptors')
+
+    project_computations = project.computations[1:-1]
+    expected_project_computations = expected_project.computations
+    for comp1, comp2 in zip(project_computations, expected_project_computations):
+        project.select_computation(comp1)
+        expected_project.select_computation(comp2)
+        testobj.assertEqual(comp1.name, comp2.name)
+        results = np.array([r.dBA for r in project.meshes[0].receptors])
+        expected_results = np.array(
+            [p.dBA for p in expected_project.meshes[0].receptors])
+
+        np.testing.assert_allclose(results, expected_results, atol=0.5)
+
+
 def compare_project_results(project, expected_project, testobj):
     """
     Compare the results to expected results extracted from projects

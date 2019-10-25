@@ -67,6 +67,9 @@ public:
     ///Operateur !=.
     bool operator!=(const TYPoint& other) const;
 
+    ///Tests equality using only coordiantes
+    bool isEqual(const TYPoint& point) const;
+
     virtual bool deepCopy(const TYElement* pOther, bool copyId = true);
 
     virtual std::string toString() const;

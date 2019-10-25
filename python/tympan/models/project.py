@@ -18,25 +18,28 @@ class Project(object):
     def __getattr__(self, name):
         return getattr(self._project, name)
 
-    def update_site_altimetry(self, verbose=False):
+    def update_site_altimetry(self, verbose=False, size_criterion=0.0, refine_mesh=True, use_vol_landtakes=False):
         """Update the altitude of the site infrastructure items
 
         Site infrastructure items whose altitude can be updated are machines, buildings, sources,
         receptors, etc.
         """
         with filter_output(verbose):
-            self._build_altimetry_mesh()
+            self._build_altimetry_mesh(
+                size_criterion=size_criterion, refine_mesh=refine_mesh, use_vol_landtakes=use_vol_landtakes)
             self._project._update_site_altimetry(self._altimetry_mesh.mesh,
                                                  self._altimetry_mesh.material_by_face)
 
-    def _build_altimetry_mesh(self):
+    def _build_altimetry_mesh(self, size_criterion, refine_mesh, use_vol_landtakes):
         """Build a mesh out of the project' site altimetry"""
         if self._altimetry_mesh is None:
-            self._altimetry_mesh = AltimetryMesh.from_site(self._project.site)
+            self._altimetry_mesh = AltimetryMesh.from_site(
+                self._project.site, size_criterion=size_criterion, refine_mesh=refine_mesh, use_vol_landtakes=use_vol_landtakes)
 
-    def export_altimetry(self, output_fpath):
+    def export_altimetry(self, output_fpath, size_criterion=0.0, refine_mesh=True, use_vol_landtakes=False):
         """Write site altimetry mesh to `output_fpath` (ply format)"""
-        self._build_altimetry_mesh()
+        self._build_altimetry_mesh(size_criterion=size_criterion,
+                                   refine_mesh=refine_mesh, use_vol_landtakes=use_vol_landtakes)
         self._altimetry_mesh.to_ply(output_fpath)
 
     def add_computation(self, current=True):
@@ -46,7 +49,7 @@ class Project(object):
         comp = self._project.add_computation()
         if current:
             self._project.select_computation(comp)
-            #self._project.set_current_computation(comp)
+            # self._project.set_current_computation(comp)
         return comp
 
     def select_computation(self, computation):
@@ -117,14 +120,15 @@ class Project(object):
         return self._project.sig_offset()
 
     @classmethod
-    def from_xml(cls, fpath, verbose=False, update_altimetry=True):
+    def from_xml(cls, fpath, verbose=False, update_altimetry=True, size_criterion=0.0, refine_mesh=True, use_vol_landtakes=False):
         """Create a project from `fpath` XML file path, on the way update project site
         infrastructure altimetry if `update_altimetry` is True
         """
         with filter_output(verbose):
             project = cls(cls.cyclass.from_xml(fpath))
         if update_altimetry:
-            project.update_site_altimetry(verbose)
+            project.update_site_altimetry(
+                verbose, size_criterion=size_criterion, refine_mesh=refine_mesh, use_vol_landtakes=use_vol_landtakes)
         return project
 
     @classmethod
@@ -134,4 +138,3 @@ class Project(object):
     def import_result(self, model, solver_result):
         """Update project's site acoustic according to solver result"""
         model._converter.postprocessing(model._model, solver_result)
-
