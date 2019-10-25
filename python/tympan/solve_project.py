@@ -8,8 +8,8 @@ from tympan.models.project import Project
 from tympan.models.solver import Model, Solver
 
 
-def solve(input_project, output_project, output_mesh, solverdir, parameters = {},
-          multithreading_on=True, interactive=False, verbose=False):
+def solve(input_project, output_project, output_mesh, solverdir, parameters={},
+          multithreading_on=True, interactive=False, verbose=False, altimetry_parameters={}):
     """ Solve an acoustic problem with Code_TYMPAN from
 
         Keywords arguments:
@@ -50,9 +50,11 @@ def solve(input_project, output_project, output_mesh, solverdir, parameters = {}
     # Load an existing project and retrieve its calcul to solve it
     try:
         logging.info("Trying to load project ...")
-        project = Project.from_xml(input_project, verbose=verbose)
+        project = Project.from_xml(
+            input_project, verbose=verbose, **altimetry_parameters)
     except RuntimeError:
-        logging.exception("Couldn't load the acoustic project from %s file", input_project)
+        logging.exception(
+            "Couldn't load the acoustic project from %s file", input_project)
         raise
     logging.info("Project loaded !")
     # Export altimetry
@@ -66,7 +68,7 @@ def solve(input_project, output_project, output_mesh, solverdir, parameters = {}
     solver = Solver.from_project(project, solverdir, verbose)
     # Setting the parameters chosen by the user
     for parameter in parameters:
-        setattr(solver,parameter,parameters[parameter]) 
+        setattr(solver, parameter, parameters[parameter])
     if not multithreading_on:
         solver.nb_threads = 1
     logging.info("Checking solver model ...")
@@ -87,8 +89,10 @@ def solve(input_project, output_project, output_mesh, solverdir, parameters = {}
         logging.info("Trying to export result project to xml ...")
         project.to_xml(output_project)
     except ValueError:
-        logging.exception("Couldn't export the acoustic results to %s file", output_project)
+        logging.exception(
+            "Couldn't export the acoustic results to %s file", output_project)
         raise
+
 
 def _check_solver_model(model, site):
     """Various checks for a solver model, to be performed before computation.

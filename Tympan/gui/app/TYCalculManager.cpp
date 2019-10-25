@@ -138,6 +138,22 @@ bool TYCalculManager::launch(LPTYCalcul pCalcul)
     args << absolute_pyscript_path << problemfile.fileName() << resultfile.fileName()
         <<  meshfile.fileName() << absolute_plugins_path;
 
+
+    // Altimetry parameters 
+    QString parameters = pCalcul->solverParams;
+    QRegExp altimetry_size_criterion_reg("(MeshElementSizeMax\\s?=\\s?)([0-9]+.[0-9]*)");
+    QRegExp altimetry_refine_mesh_reg("(RefineMesh\\s?=\\s?)(True|False)");
+    QRegExp altimetry_use_volumes_landtakes_reg("(UseVolumesLandtake\\s?=\\s?)(True|False)");
+    int pos_size = altimetry_size_criterion_reg.indexIn(parameters);
+    int pos_refi = altimetry_refine_mesh_reg.indexIn(parameters);
+    int pos_land = altimetry_use_volumes_landtakes_reg.indexIn(parameters);
+    if (pos_size > -1 && pos_refi > -1 && pos_land > -1 ){
+        QString altimetry_size_criterion = altimetry_size_criterion_reg.cap(2);
+        QString altimetry_refine_mesh = altimetry_refine_mesh_reg.cap(2);
+        QString altimetry_use_volumes_landtakes = altimetry_use_volumes_landtakes_reg.cap(2);
+        args << altimetry_size_criterion << altimetry_refine_mesh << altimetry_use_volumes_landtakes;
+    }
+
     logger.info(TR("id_msg_go_calcul"));
 
     if (!python_gui(args))

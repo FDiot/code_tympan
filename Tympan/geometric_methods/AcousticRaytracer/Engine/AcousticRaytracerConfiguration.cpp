@@ -48,8 +48,8 @@ AcousticRaytracerConfiguration::AcousticRaytracerConfiguration()
     DiffractionDropDownNbRays = false;
 
     // Post Filters
-    UsePostFilter = false;
-    DebugUseCloseEventPostFilter = false;
+    UsePostFilters = false;
+    DebugUseCloseEventSelector = false;
     DebugUseDiffractionAngleSelector = false;
     DebugUseDiffractionPathSelector = false;
     DebugUseFermatSelector = false;

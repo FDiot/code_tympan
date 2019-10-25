@@ -53,6 +53,9 @@ SolverConfiguration::SolverConfiguration()
     DiffractionUseDistanceAsFilter = true;
     KeepDebugRay = false;
     UsePostFilters = true;
+    MeshElementSizeMax = 0.0;   //!< Not used
+    RefineMesh = true;
+    UseVolumesLandtake = false;
 
     //EnableFullTargets = false;
     //TargetsDensity = 0.1f;
@@ -70,7 +73,12 @@ SolverConfiguration::SolverConfiguration()
     UseRealGround = true;
     UseLateralDiffraction = true;
     UseReflection = true;
-    PropaConditions = true;
+
+    PropaConditions = 0;
+    DSWindDirection = 0;
+    AngleFavorable = 45;
+    AngleDefavorable = 45;
+
     H1parameter = 10.;
     ModSummation = false;
 

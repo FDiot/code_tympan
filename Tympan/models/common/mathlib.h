@@ -116,6 +116,9 @@ public:
     base_vec3(const base_vec3& _v, const base_vec3& _w): x(_w.x - _v.x), y(_w.y - _v.y), z(_w.z - _v.z) {}                          //!< ab vector coordinates
 
     base_vec3(const vec4& _v);
+    base_t get_x(){return this->x;}
+    base_t get_y(){return this->y;}
+    base_t get_z(){return this->z;}
 
     int operator==(const base_vec3& _v) { return (fabs(this->x - _v.x) < EPSILON_6 && fabs(this->y - _v.y) < EPSILON_6 && fabs(this->z - _v.z) < EPSILON_6); }
     int operator!=(const base_vec3& _v) { return !(*this == _v); }

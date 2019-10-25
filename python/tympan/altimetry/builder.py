@@ -24,6 +24,29 @@ def points_to_coords(points):
     return [(p.x, p.y) for p in points]
 
 
+def unique_points(points):
+    """Return points without "rounded" duplicates while preserving order"""
+    coords = lambda p: (p.x, p.y)
+    rounded = lambda p: (round(p.x, 2), round(p.y, 2))
+    points_set = set()
+    output = []
+    for p in points:
+        if rounded(p) not in points_set:
+            output.append(coords(p))
+            points_set.add(rounded(p))
+    return output
+
+
+def counter_clockwise_contours(points):
+    """Return a list of coordinates in counter_clockwise order from a list of Point3D"""
+    _is_counter_clockwise = lambda contour: sum(
+        [(p2.x - p1.x) * (p2.y + p1.y) for p1, p2 in zip(points, points[1:] + [points[0]])]) < 0
+    if _is_counter_clockwise(points):
+        return unique_points(points)
+    else:
+        return unique_points(points[::-1])
+
+
 def ground_material_from_business(material):
     """Return a GroundMaterial from a business model material"""
     return GroundMaterial(material.elem_id, material.resistivity)
@@ -53,7 +76,7 @@ def build_material_area(ty_materialarea, altimetry_groundmaterial, landtake_poin
                    id=ty_materialarea.elem_id, **kwargs)
 
 
-def build_sitenode(ty_site, mainsite=True):
+def build_sitenode(ty_site, mainsite=True, use_vol_landtakes=False):
     """Build an altimetry SiteNode from a Tympan topography site `ty_site`.
 
     If `mainsite` is True the site is assumed to be the parent possibly
@@ -95,11 +118,13 @@ def build_sitenode(ty_site, mainsite=True):
             altitude=cylcurve.altitude,
             id=cylcurve.elem_id)
         altimetry_site.add_child(alcurve)
-    # Ground contour (infrastructure landtake)
-    for id_, volume_contours in ty_site.ground_contour.items():
-        contours_coords = map(points_to_coords, volume_contours)
-        altimetry_site.add_child(
-            InfrastructureLandtake(*contours_coords, id=id_))
+
+    if use_vol_landtakes:
+        # Ground contour (infrastructure landtake)
+        for id_, volume_contours in ty_site.ground_contour.items():
+            contours_coords = map(counter_clockwise_contours, volume_contours)
+            altimetry_site.add_child(
+                InfrastructureLandtake(*contours_coords, id=id_))
     # Recurse
     cysubsites = ty_site.subsites
     for cysbsite in cysubsites:
@@ -140,7 +165,8 @@ def add_material(ty_site, altimetry_site, material_border_points, is_mainsite):
                 datamodel.DEFAULT_MATERIAL = almaterial
                 continue
             else:
-                almatarea = build_material_area(cymarea, almaterial, material_border_points)
+                almatarea = build_material_area(
+                    cymarea, almaterial, material_border_points)
         else:
             almatarea = build_material_area(cymarea, almaterial)
         altimetry_site.add_child(almatarea)
@@ -148,13 +174,13 @@ def add_material(ty_site, altimetry_site, material_border_points, is_mainsite):
 
 # Altimetry mesh building utilities.
 def build_altimetry(mainsite, allow_features_outside_mainsite=True,
-                    size_criterion=0.0):
+                    size_criterion=0.0, refine_mesh=True):
     """Return the results of altimetry building from a site tree model."""
     cleaner = recursively_merge_all_subsites(
         mainsite, allow_outside=allow_features_outside_mainsite)
     merged_site = cleaner.merged_site()
     builder = MeshBuilder(merged_site, size_criterion=size_criterion)
-    mesh = builder.build_mesh()
+    mesh = builder.build_mesh(refine=refine_mesh)
     filler = MeshFiller(mesh, builder.vertices_for_feature)
     feature_by_face = filler.fill_material_and_landtakes(merged_site, cleaner)
     builder.join_with_landtakes(mesh)
@@ -199,7 +225,8 @@ class MeshBuilder(object):
         mesh = self._build_triangulation(alti)
         if refine:
             # Refine the mesh.
-            # TODO (optional) flood landtake in order to mark them as not to be refined
+            # TODO (optional) flood landtake in order to mark them as not to be
+            # refined
             mesh.refine_mesh(size_criterion=self.size_criterion,
                              shape_criterion=self.shape_criterion)
         self._compute_informations(mesh)
@@ -221,7 +248,8 @@ class MeshBuilder(object):
         try:
             shape = self._site.features_by_id[feature.id].shape
         except KeyError:
-            # The element was filtered out (e.g. it was outside of its sub-site)
+            # The element was filtered out (e.g. it was outside of its
+            # sub-site)
             return None
         vertices_groups = []
         for polyline in elementary_shapes(shape):
@@ -229,11 +257,13 @@ class MeshBuilder(object):
                 points = polyline.coords[:]
             elif isinstance(polyline, geometry.Polygon):
                 if list(polyline.interiors):
-                    raise ValueError("Polygons with holes are not (yet) supported")
+                    raise ValueError(
+                        "Polygons with holes are not (yet) supported")
                 points = polyline.exterior.coords[:]
                 # NB: polygons' coordinates sequences are automatically closed
             elif isinstance(polyline, geometry.Point):
-                warn('Found an isolated point in the altimetry features', RuntimeWarning)
+                warn('Found an isolated point in the altimetry features',
+                     RuntimeWarning)
                 continue
             else:
                 raise TypeError("Only level curves or waterbodies are expected, "
@@ -248,7 +278,7 @@ class MeshBuilder(object):
 
         The mesh is built by walking the equivalent site for level curves *only*.
         """
-        alti = ReferenceElevationMesh() # Altimetric base
+        alti = ReferenceElevationMesh()  # Altimetric base
         for level_curve in self._site.level_curves:
             props = level_curve.build_properties()
             assert 'altitude' in props
@@ -300,6 +330,13 @@ class MeshBuilder(object):
                 mean_alt = np.mean([mesh.vertices_info[vh].altitude
                                     for vh in polyline])
                 close_it = polyline[0] != polyline[-1]
+                if close_it:
+                    mean_alt = np.mean([mesh.vertices_info[vh].altitude
+                                        for vh in polyline])
+                else:
+                    mean_alt = np.mean([mesh.vertices_info[vh].altitude
+                                        for vh in polyline[:-1]])
+
                 contour_vertices = mesh.iter_vertices_for_input_polyline(
                     polyline, close_it=close_it)
                 flooder = mesh.flood_polygon(LandtakeFaceFlooder, polyline,
@@ -344,7 +381,7 @@ class MeshFiller(object):
                 continue
             point = self._mesh.point_for_face(fh)
             assert point is not None, \
-                    'could not find a point inside face handle {}'.format(fh)
+                'could not find a point inside face handle {}'.format(fh)
             point = geometry.Point((point.x(), point.y()))
             for feature in features:
                 if feature.shape.contains(point):

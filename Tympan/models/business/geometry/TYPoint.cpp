@@ -85,6 +85,11 @@ bool TYPoint::operator!=(const TYPoint& other) const
     return !operator==(other);
 }
 
+bool TYPoint::isEqual(const TYPoint& point) const
+{
+    return OCoord3D::operator ==(point);
+}
+
 bool TYPoint::deepCopy(const TYElement* pOther, bool copyId /*=true*/)
 {
     if (!TYElement::deepCopy(pOther, copyId)) { return false; }

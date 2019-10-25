@@ -63,6 +63,8 @@ public:
 
     int AnalyticTypeTransfo;	//!< Type of geometry modifier used (only one for the moment: geometry_modifier_z_correction)
     float MeshElementSizeMax;	//!< Not used
+    bool RefineMesh;
+    bool UseVolumesLandtake;
     bool showScene;				//!< Flag to export Scene in order to visualize it
 
     float MinSRDistance;		//!< Not used
@@ -72,7 +74,11 @@ public:
     bool UseScreen;				//!< Not used
     bool UseLateralDiffraction;	//!< Flag to compute horizontal paths in the acoustic path finder
     bool UseReflection;			//!< Flag to use reflection on vertical walls
-    bool PropaConditions;		//!< Flag to check that reflections will be limited between source and receptors in the acoustic model
+    int PropaConditions;        //!< Flag to check that reflections will be limited between source and receptors in the acoustic model
+    float DSWindDirection;
+    float AngleFavorable;
+    float AngleDefavorable;
+
     float H1parameter;			//!< Multiplicative coefficient for the additional reflections if PropaConditions is true
     bool ModSummation;			//!< Flag to activate in the acoustic model a calculation with interference
 

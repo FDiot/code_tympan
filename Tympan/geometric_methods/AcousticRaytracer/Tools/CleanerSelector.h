@@ -40,10 +40,10 @@ public :
 
     virtual SELECTOR_RESPOND canBeInserted(T* r, unsigned long long& replace)
     {
-        vector< std::shared_ptr<Event> > *events = r->getEvents();
+        vector< boost::shared_ptr<Event> > *events = r->getEvents();
 		if (events->size() == 0) { return SELECTOR_ACCEPT; }
 
-		vector< std::shared_ptr<Event> >::iterator it = events->begin();
+		vector< boost::shared_ptr<Event> >::iterator it = events->begin();
 		while(it != events->end())
 		{
 			if ( (*it)->getType() == NOTHING )
@@ -61,10 +61,10 @@ public :
     virtual void insert(T* r) { return; }
     virtual bool insertWithTest(T* r)
     {
-         vector< std::shared_ptr<Event> > *events = r->getEvents();
+         vector< boost::shared_ptr<Event> > *events = r->getEvents();
 		if (events->size() == 0) { return true; }
 
-		vector< std::shared_ptr<Event> >::iterator it = events->begin();
+		vector< boost::shared_ptr<Event> >::iterator it = events->begin();
 		while(it != events->end())
 		{
 			if ( (*it)->getType() == NOTHING )
