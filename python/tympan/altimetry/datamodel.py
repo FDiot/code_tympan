@@ -26,8 +26,10 @@ GEOMETRY_TYPES = (
 
 def _preproc_one_coord(coord):
     if len(coord) not in (2, 3):
-        raise ValueError("Coordinates are expected to be seq of 2 or 3 numbers")
+        raise ValueError(
+            "Coordinates are expected to be seq of 2 or 3 numbers")
     return tuple(float(c) for c in coord)
+
 
 def _preproc_point_seq(coordinates):
     return [_preproc_one_coord(c) for c in coordinates]
@@ -46,6 +48,7 @@ class InconsistentGeometricModel(Exception):
     def __str__(self):
         return self.message.format(**self.__dict__)
 
+
 class GroundMaterial(object):
 
     def __init__(self, id_, resistivity=None):
@@ -58,18 +61,18 @@ class GroundMaterial(object):
 
 MATERIAL_WATER = GroundMaterial("Water")
 DEFAULT_MATERIAL = GroundMaterial("__default__")
-HIDDEN_MATERIAL =  GroundMaterial("__hidden__")
+HIDDEN_MATERIAL = GroundMaterial("__hidden__")
 
 
 class GeometricFeature(object):
-    geometric_type = None # To be overridden by derived classes
+    geometric_type = None  # To be overridden by derived classes
 
     def __init__(self, coords_or_shape, id):
         if isinstance(coords_or_shape, geometry.base.BaseGeometry):
             self.set_shape(coords_or_shape)
         else:
             self._coords = _preproc_point_seq(coords_or_shape)
-            self._shape = None # to cache the Shapely shape
+            self._shape = None  # to cache the Shapely shape
         if id:
             assert isinstance(id, str), 'id "%r" is not a string' % id
         self.id = id
@@ -77,7 +80,8 @@ class GeometricFeature(object):
     def set_shape(self, shape):
         self._shape = shape
         if isinstance(shape, geometry.MultiPolygon):
-            self._coords = [subshape.exterior.coords for subshape in shape.geoms]
+            self._coords = [
+                subshape.exterior.coords for subshape in shape.geoms]
         elif isinstance(shape, geometry.Polygon):
             self._coords = shape.exterior.coords
         elif isinstance(shape, geometry.base.BaseMultipartGeometry):
@@ -101,7 +105,7 @@ class GeometricFeature(object):
 
     def build_feature(self):
         d = {"type": "Feature",
-             "geometry" : self.build_geometry(),
+             "geometry": self.build_geometry(),
              "properties": self.build_properties()}
         if self.id is not None:
             d["id"] = self.id
@@ -133,13 +137,14 @@ class GeometricFeature(object):
         return self._shape
 
     def ensure_ok(self):
-        shape = self.shape # CAUTION Cache the shape
+        shape = self.shape  # CAUTION Cache the shape
         if shape.is_valid:
             return
-        else :
+        else:
             raise InconsistentGeometricModel("Invalid shapely shape : {details}",
                                              details=explain_validity(shape),
                                              ids=[self.id])
+
 
 def elementary_shapes(shape):
     if isinstance(shape, geometry.base.BaseMultipartGeometry):
@@ -177,7 +182,7 @@ class TympanFeature(GeometricFeature):
 
     @property
     def parent_site_id(self):
-        return  self.parent_site and self.parent_site.id
+        return self.parent_site and self.parent_site.id
 
     def build_properties(self):
         p = super(TympanFeature, self).build_properties()
@@ -199,9 +204,10 @@ class LevelCurve(TympanFeature):
         self.altitude = float(altitude)
         if close_it:
             if isinstance(coords, geometry.base.BaseGeometry):
-                raise ValueError("close_it=True is incompatible with passing an existing shape")
+                raise ValueError(
+                    "close_it=True is incompatible with passing an existing shape")
             else:
-                coords = coords + [coords[0]] # Close the sequence of points
+                coords = coords + [coords[0]]  # Close the sequence of points
         super(LevelCurve, self).__init__(coords, **kwargs)
 
     def build_coordinates(self):
@@ -266,7 +272,8 @@ class WaterBody(MaterialArea, LevelCurve):
     geometric_type = "Polygon"
 
     def __init__(self, coords, **kwargs):
-        super(WaterBody, self).__init__(coords, material=MATERIAL_WATER, **kwargs)
+        super(WaterBody, self).__init__(
+            coords, material=MATERIAL_WATER, **kwargs)
 
 
 class SiteNode(PolygonalTympanFeature):
@@ -300,7 +307,7 @@ class SiteNode(PolygonalTympanFeature):
             return []
         feature_ids = [feature.id for feature in site.all_features]
         for subsite in site.subsites:
-                feature_ids.extend(SiteNode.recursive_features_ids(subsite))
+            feature_ids.extend(SiteNode.recursive_features_ids(subsite))
         return feature_ids
 
     @property
@@ -341,7 +348,7 @@ class SiteNode(PolygonalTympanFeature):
     def non_altimetric_features(self):
         return (self.children["MaterialArea"] +
                 self.children["VegetationArea"] +
-                self.children["InfrastructureLandtake"] )
+                self.children["InfrastructureLandtake"])
 
 
 class SiteLandtake(LevelCurve):
