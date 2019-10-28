@@ -116,7 +116,8 @@ def build_sitenode(ty_site, mainsite=True, use_vol_landtakes=False):
         alcurve = LevelCurve(
             coords=points_to_coords(cylcurve.points),
             altitude=cylcurve.altitude,
-            id=cylcurve.elem_id)
+            id=cylcurve.elem_id,
+            name=cylcurve.name)
         altimetry_site.add_child(alcurve)
 
     if use_vol_landtakes:
@@ -269,7 +270,7 @@ class MeshBuilder(object):
                 raise TypeError("Only level curves or waterbodies are expected, "
                                 "not %s found in %s" % (polyline, feature))
             vertices, _ = mesher.insert_polyline(
-                points, id=feature.id, **properties)
+                points, id=feature.id, name=feature.name, **properties)
             vertices_groups.append(vertices)
         return vertices_groups
 

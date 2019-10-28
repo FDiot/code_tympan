@@ -1,8 +1,10 @@
 from tympan.altimetry import AltimetryMesh
+from tympan.altimetry.datamodel import InconsistentGeometricModel
 from tympan.models import filter_output
 from tympan.models._business import Project as cyProject
 from tympan.models._common import Spectrum
 from tympan.models.solver import fetch_solverdir
+import ctypes
 
 
 class Project(object):
@@ -25,8 +27,14 @@ class Project(object):
         receptors, etc.
         """
         with filter_output(verbose):
-            self._build_altimetry_mesh(
-                size_criterion=size_criterion, refine_mesh=refine_mesh, use_vol_landtakes=use_vol_landtakes)
+            try:
+                self._build_altimetry_mesh(
+                    size_criterion=size_criterion, refine_mesh=refine_mesh, use_vol_landtakes=use_vol_landtakes)
+            except InconsistentGeometricModel as exc:
+                message_box = ctypes.windll.user32.MessageBoxW
+                message = exc.message
+                message_box(None, message, 'Erreur altimetrie', 0)
+                raise
             self._project._update_site_altimetry(self._altimetry_mesh.mesh,
                                                  self._altimetry_mesh.material_by_face)
 
