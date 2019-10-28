@@ -28,7 +28,7 @@ from CGAL.CGAL_Mesh_2 import (
     Mesh_2_Constrained_Delaunay_triangulation_plus_2_Edge as Edge,
     Delaunay_mesh_plus_size_criteria_2 as Mesh_criteria,
     refine_Delaunay_mesh_2 as CGAL_refine_Delaunay_mesh)
-from CGAL.CGAL_Triangulation_2 import  (
+from CGAL.CGAL_Triangulation_2 import (
     Ref_Locate_type_2 as Ref_locate_type,
     VERTEX, EDGE, FACE, OUTSIDE_CONVEX_HULL, OUTSIDE_AFFINE_HULL
 )
@@ -40,7 +40,7 @@ _PROXIMITY_THRESHOLD = 0.01
 
 # Monkey patch Edge to work around issue
 # http://code.google.com/p/cgal-bindings/issues/detail?id=48
-Edge.__iter__= lambda this: iter((this[0], this[1]))
+Edge.__iter__ = lambda this: iter((this[0], this[1]))
 
 
 from . datamodel import InconsistentGeometricModel, DEFAULT_MATERIAL, HIDDEN_MATERIAL
@@ -48,6 +48,7 @@ from . datamodel import InconsistentGeometricModel, DEFAULT_MATERIAL, HIDDEN_MAT
 
 UNSPECIFIED_ALTITUDE = float('nan')
 UNSPECIFIED_MATERIAL = None
+
 
 def to_cgal_point(pt):
     if isinstance(pt, Point_2):
@@ -60,11 +61,13 @@ def to_cgal_point(pt):
     else:
         raise TypeError("Don't know how to make a CGAL Point_2 from", pt)
 
+
 def sorted_vertex_pair(v1, v2):
     if v1.__hash__() < v2.__hash__():
         return (v1, v2)
     else:
         return (v2, v1)
+
 
 def first_and_last(iterable):
     it = iter(iterable)
@@ -72,6 +75,7 @@ def first_and_last(iterable):
     for e in it:
         last = e
     return (first, last)
+
 
 def ilinks(it, close_it=False):
     """Given an input iterable `it` iter over the successive pairs (v0,
@@ -84,6 +88,7 @@ def ilinks(it, close_it=False):
         prev = el
     if close_it and prev != first:
         yield (prev, first)
+
 
 class MeshedCDTWithInfo(object):
     """ This class provides the meshing of a geometry with arbitrary
@@ -128,8 +133,9 @@ class MeshedCDTWithInfo(object):
         """
         vmap = {} if vmap is None else vmap
         if len(vmap) != 0:
-            raise ValueError("The vertice map output argument is expected to be empty")
-        class_ =  type(self) if class_ is None else class_
+            raise ValueError(
+                "The vertice map output argument is expected to be empty")
+        class_ = type(self) if class_ is None else class_
         # Copying a CDT is tricky
         # See http://code.google.com/p/cgal-bindings/issues/detail?id=49
         newone = class_()
@@ -137,14 +143,17 @@ class MeshedCDTWithInfo(object):
         vmap.update(self.vertices_map_to_other_mesh(newone))
         for orig_vh, orig_info in self._input_vertices_infos.items():
             dest_vh = vmap[orig_vh]
-            dest_info = copy.deepcopy(orig_info) if deep else copy.copy(orig_info)
+            dest_info = copy.deepcopy(
+                orig_info) if deep else copy.copy(orig_info)
             newone._input_vertices_infos[dest_vh] = dest_info
         for (orig_va, orig_vb), orig_info in self._input_constraints_infos.items():
             dest_va, dest_vb = vmap[orig_va], vmap[orig_vb]
-            dest_info = copy.deepcopy(orig_info) if deep else copy.copy(orig_info)
+            dest_info = copy.deepcopy(
+                orig_info) if deep else copy.copy(orig_info)
             if sorted_vertex_pair(dest_va, dest_vb) != (dest_va, dest_vb):
                 warn("Vertex pair unexpectedly not sorted during copy", RuntimeWarning)
-            newone._input_constraints_infos[sorted_vertex_pair(dest_va, dest_vb)] = dest_info
+            newone._input_constraints_infos[
+                sorted_vertex_pair(dest_va, dest_vb)] = dest_info
         return newone
 
     def count_edges(self):
@@ -172,8 +181,9 @@ class MeshedCDTWithInfo(object):
 
     def insert_constraint(self, va, vb, **kwargs):
         self.cdt.insert_constraint(va, vb)
-        self._input_constraints_infos[sorted_vertex_pair(va, vb)] = self.edge_info(**kwargs)
-        return (va, vb) # Important to return the contrain in the input order
+        self._input_constraints_infos[
+            sorted_vertex_pair(va, vb)] = self.edge_info(**kwargs)
+        return (va, vb)  # Important to return the contrain in the input order
 
     def insert_point(self, point, **kwargs):
         point = to_cgal_point(point)
@@ -236,7 +246,8 @@ class MeshedCDTWithInfo(object):
         if is_edge:
             return (fh.object(), i.object())
         else:
-            raise ValueError("This is not an edge (%s, %s)" % (va.point(), vb.point()))
+            raise ValueError("This is not an edge (%s, %s)" %
+                             (va.point(), vb.point()))
 
     def ensure_half_edge(self, edge):
         if isinstance(edge[0], Vertex_handle):
@@ -272,7 +283,7 @@ class MeshedCDTWithInfo(object):
         """
         edges_infos = {}
         if edges is None:
-            edges_it = self.cdt.finite_edges() # Iter over half-edges !!!
+            edges_it = self.cdt.finite_edges()  # Iter over half-edges !!!
         else:
             edges_it = iter(edges)
         for edge in edges_it:
@@ -283,11 +294,11 @@ class MeshedCDTWithInfo(object):
         return edges_infos
 
     def iter_input_constraint_around(self, vertex):
-        incident_constrained_edges = [] # Output argument a la C++
+        incident_constrained_edges = []  # Output argument a la C++
         self.cdt.incident_constraints(vertex, incident_constrained_edges)
         for edge in incident_constrained_edges:
             for input_contraint in self.iter_input_constraint_overlapping(edge):
-                 yield input_contraint
+                yield input_contraint
 
     def fetch_constraint_infos_for_vertices(self, vertices=None):
         """Return a dict mapping each given vertices (or all vertices if none
@@ -327,7 +338,8 @@ class MeshedCDTWithInfo(object):
         init_map = init_map or {}
         d = {}
         for v, info_list in self.fetch_constraint_infos_for_vertices(vertices=vertices).items():
-            info = self._input_vertices_infos.get(v, init_map.get(v, self.vertex_info()))
+            info = self._input_vertices_infos.get(
+                v, init_map.get(v, self.vertex_info()))
             try:
                 d[v] = reduce(merge_function, info_list, info)
             except InconsistentGeometricModel as exc:
@@ -355,14 +367,15 @@ class MeshedCDTWithInfo(object):
                 d[v_pair] = reduce(merge_function, info_list, info)
             except InconsistentGeometricModel as exc:
                 pa, pb = (v.point() for v in v_pair)
-                exc.witness_point = ((pa.x() + pb.x())/2.0, (pa.y() + pb.y())/2.0)
+                exc.witness_point = ((pa.x() + pb.x()) /
+                                     2.0, (pa.y() + pb.y()) / 2.0)
                 raise
         return d
 
     def segment_for_edge(self, edge):
         if isinstance(edge[0], Face_handle):
             return self.cdt.segment(edge)
-        else: # Vertices pair assumed
+        else:  # Vertices pair assumed
             return Segment(edge[0].point(), edge[1].point())
 
     def faces_for_edge(self, va, vb):
@@ -372,7 +385,7 @@ class MeshedCDTWithInfo(object):
         face1, i = self.half_edge_from_vertices_pair(va, vb)
         face2 = face1.neighbor(i)
         vaa, vbb = self.vertices_pair_from_half_edge(face1, i)
-        if (vaa, vbb)==(va, vb): # f1 is the face on the left of a->b
+        if (vaa, vbb) == (va, vb):  # f1 is the face on the left of a->b
             return (face1, face2)
         else:
             return (face2, face1)
@@ -514,7 +527,8 @@ class MeshedCDTWithInfo(object):
             return face_handle, face_handle.vertex(index.object())
         else:
             assert locate_type == OUTSIDE_AFFINE_HULL
-            raise InconsistentGeometricModel("Degenerate triangulation (0D or 1D)")
+            raise InconsistentGeometricModel(
+                "Degenerate triangulation (0D or 1D)")
 
     # Export utilities.
     def as_arrays(self):
@@ -548,8 +562,8 @@ class MeshedCDTWithInfo(object):
         # Eliminate identical adjacent points.
         if len(points) < 2:
             return points
-        points =  [p for i, p in enumerate(points)
-                   if not p.equals(points[i-1])]
+        points = [p for i, p in enumerate(points)
+                  if not p.equals(points[i - 1])]
         return points
 
     def _segment_intersection_points(self, segment):
@@ -586,7 +600,7 @@ class MeshedCDTWithInfo(object):
 class InfoWithIDsAndAltitude(object):
     ALTITUDE_TOLERANCE = 0.1
 
-    def  __init__(self, altitude=UNSPECIFIED_ALTITUDE, id=None, **kwargs):
+    def __init__(self, altitude=UNSPECIFIED_ALTITUDE, id=None, **kwargs):
         self.ids = kwargs.pop('ids', set((id and [id]) or []))
         self.altitude = float(altitude)
 
@@ -597,11 +611,12 @@ class InfoWithIDsAndAltitude(object):
         """
         self.merge_ids(other_info)
         self.merge_altitude(other_info)
-        return self # so as to enable using reduce
+        return self  # so as to enable using reduce
 
     def merge_ids(self, other_info):
         ids = getattr(other_info, "ids", None)
-        if ids is None: return
+        if ids is None:
+            return
         self.ids.update(ids)
 
     def merge_altitude(self, other_info):
@@ -621,7 +636,7 @@ class InfoWithIDsAndAltitude(object):
         return "%s(%s)" % (self.__class__.__name__, args)
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__): # XXX type(other) is type(self)
+        if isinstance(other, self.__class__):  # XXX type(other) is type(self)
             return self.__dict__ == other.__dict__
         else:
             return False
@@ -633,11 +648,11 @@ class InfoWithIDsAndAltitude(object):
 class EdgeInfoWithMaterial(InfoWithIDsAndAltitude):
     """ Add a flag if the edge is a boundary for materials """
 
-    def  __init__(self, altitude=UNSPECIFIED_ALTITUDE,
-                  material=None, id=None, **kwargs):
+    def __init__(self, altitude=UNSPECIFIED_ALTITUDE,
+                 material=None, id=None, **kwargs):
         super(EdgeInfoWithMaterial, self).__init__(altitude, id=id, **kwargs)
         self.material_boundary = material is not None
-        assert material is None or isinstance(material, str) #XXX
+        assert material is None or isinstance(material, str)  # XXX
         self.landtake_boundary = material == HIDDEN_MATERIAL.id
 
     def merge_material_boundary(self, other):
@@ -647,7 +662,7 @@ class EdgeInfoWithMaterial(InfoWithIDsAndAltitude):
     def merge_with(self, other_info):
         super(EdgeInfoWithMaterial, self).merge_with(other_info)
         self.merge_material_boundary(other_info)
-        return self # so as to enable using reduce
+        return self  # so as to enable using reduce
 
 
 class ElevationMesh(MeshedCDTWithInfo):
@@ -667,20 +682,24 @@ class ElevationMesh(MeshedCDTWithInfo):
 
     def copy(self, class_=None, deep=False, vmap=None):
         vmap = {} if vmap is None else vmap
-        newone = super(ElevationMesh, self).copy(class_=class_, deep=deep, vmap=vmap)
+        newone = super(ElevationMesh, self).copy(
+            class_=class_, deep=deep, vmap=vmap)
         for orig_vh, orig_info in self.vertices_info.items():
             dest_vh = vmap[orig_vh]
-            dest_info = copy.deepcopy(orig_info) if deep else copy.copy(orig_info)
+            dest_info = copy.deepcopy(
+                orig_info) if deep else copy.copy(orig_info)
             newone.vertices_info[dest_vh] = dest_info
         for (orig_va, orig_vb), orig_info in self.edges_info.items():
             dest_va, dest_vb = vmap[orig_va], vmap[orig_vb]
-            dest_info = copy.deepcopy(orig_info) if deep else copy.copy(orig_info)
+            dest_info = copy.deepcopy(
+                orig_info) if deep else copy.copy(orig_info)
             newone.edges_info[(dest_va, dest_vb)] = dest_info
         return newone
 
     def insert_point(self, point, **kwargs):
         vh = super(ElevationMesh, self).insert_point(point, **kwargs)
-        self.vertices_info[vh] = self.input_vertex_infos(vh) # TODO Consider copying ?
+        self.vertices_info[vh] = self.input_vertex_infos(
+            vh)  # TODO Consider copying ?
         return vh
 
     def point3d_for_vertex(self, vh):
@@ -721,7 +740,7 @@ class ElevationMesh(MeshedCDTWithInfo):
     def point_altitude(self, p, face_hint=None):
         p = to_cgal_point(p)
         fh, vh_or_i = self.locate_point(p, face_hint=face_hint)
-        if fh is None: # point p is out of the convex hull of the triangulation
+        if fh is None:  # point p is out of the convex hull of the triangulation
             return UNSPECIFIED_ALTITUDE
         if (isinstance(vh_or_i, Vertex_handle)
                 and vh_or_i in self._input_vertices_infos):
@@ -740,8 +759,8 @@ class ElevationMesh(MeshedCDTWithInfo):
                                              witness_point=(p.x(), p.y()))
         p3 = inter.get_Point_3()
         alti = p3.z()
-        dist = abs((p3-p2).squared_length()-alti**2)
-        assert dist <= _PROXIMITY_THRESHOLD * 1e-3  + _PROXIMITY_THRESHOLD * (alti**2), (
+        dist = abs((p3 - p2).squared_length() - alti**2)
+        assert dist <= _PROXIMITY_THRESHOLD * 1e-3 + _PROXIMITY_THRESHOLD * (alti**2), (
             "unexpected distance between point and its projection : %f (threshold = %f, altitude = %f)"
             % (dist, _PROXIMITY_THRESHOLD, alti))
         return alti
@@ -796,12 +815,14 @@ class ReferenceElevationMesh(ElevationMesh):
 
     def insert_point(self, point, **kwargs):
         if 'altitude' not in kwargs:
-            raise TypeError('altitude is mandatory for *reference* elevation meshes')
+            raise TypeError(
+                'altitude is mandatory for *reference* elevation meshes')
         return super(ReferenceElevationMesh, self).insert_point(point, **kwargs)
 
     def insert_polyline(self, polyline, **kwargs):
         if 'altitude' not in kwargs:
-            raise TypeError('altitude is mandatory for *reference* elevation meshes')
+            raise TypeError(
+                'altitude is mandatory for *reference* elevation meshes')
         return super(ReferenceElevationMesh, self).insert_polyline(polyline, **kwargs)
 
 
@@ -822,6 +843,7 @@ class ElevationProfile(object):
     >>> dh = h.gradient()
     >>> d2h = dh.gradient()
     """
+
     def __init__(self, mesh, segment):
         self._mesh = mesh
         if not isinstance(segment, LineString):
