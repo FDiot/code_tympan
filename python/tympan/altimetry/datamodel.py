@@ -38,10 +38,11 @@ def _preproc_point_seq(coordinates):
 class InconsistentGeometricModel(Exception):
 
     def __init__(self, message,
-                 ids=None, witness_point=None, **kwargs):
+                 ids=None, witness_point=None, names=None, **kwargs):
         super(InconsistentGeometricModel, self).__init__(message)
         self.message = message
         self.ids = list(ids) if ids else []
+        self.names = list(names) if names else []
         self.witness_point = witness_point
         self.__dict__.update(kwargs)
 
@@ -67,7 +68,7 @@ HIDDEN_MATERIAL = GroundMaterial("__hidden__")
 class GeometricFeature(object):
     geometric_type = None  # To be overridden by derived classes
 
-    def __init__(self, coords_or_shape, id):
+    def __init__(self, coords_or_shape, id, name=None):
         if isinstance(coords_or_shape, geometry.base.BaseGeometry):
             self.set_shape(coords_or_shape)
         else:
@@ -76,6 +77,7 @@ class GeometricFeature(object):
         if id:
             assert isinstance(id, str), 'id "%r" is not a string' % id
         self.id = id
+        self.name = name
 
     def set_shape(self, shape):
         self._shape = shape
@@ -109,6 +111,8 @@ class GeometricFeature(object):
              "properties": self.build_properties()}
         if self.id is not None:
             d["id"] = self.id
+        if self.name is not None:
+            d["name"] = self.name
         return d
 
     def build_shape(self):

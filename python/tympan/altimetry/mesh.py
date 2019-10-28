@@ -335,6 +335,7 @@ class MeshedCDTWithInfo(object):
         If vertices is None all vertices are considered.
 
         """
+
         init_map = init_map or {}
         d = {}
         for v, info_list in self.fetch_constraint_infos_for_vertices(vertices=vertices).items():
@@ -344,8 +345,10 @@ class MeshedCDTWithInfo(object):
                 d[v] = reduce(merge_function, info_list, info)
             except InconsistentGeometricModel as exc:
                 exc.witness_point = self.py_vertex(v)
-                raise InconsistentGeometricModel(
-                    exc.message + " at " + str(exc.witness_point), ids=exc.ids)
+                exc.message = exc.message + "\nElements : {names} \nPoint d'intersection : {witness_point}".format(
+                    names=exc.names,
+                    witness_point=exc.witness_point)
+                raise
         return d
 
     def merge_info_for_edges(self, merge_function, edges=None, init_map=None):
@@ -600,8 +603,9 @@ class MeshedCDTWithInfo(object):
 class InfoWithIDsAndAltitude(object):
     ALTITUDE_TOLERANCE = 0.1
 
-    def __init__(self, altitude=UNSPECIFIED_ALTITUDE, id=None, **kwargs):
+    def __init__(self, altitude=UNSPECIFIED_ALTITUDE, id=None, name=None, **kwargs):
         self.ids = kwargs.pop('ids', set((id and [id]) or []))
+        self.names = kwargs.pop('names', set((name and [name]) or []))
         self.altitude = float(altitude)
 
     def merge_with(self, other_info):
@@ -610,6 +614,7 @@ class InfoWithIDsAndAltitude(object):
         Returns self to enable chaining or merge via reduce.
         """
         self.merge_ids(other_info)
+        self.merge_names(other_info)
         self.merge_altitude(other_info)
         return self  # so as to enable using reduce
 
@@ -618,6 +623,12 @@ class InfoWithIDsAndAltitude(object):
         if ids is None:
             return
         self.ids.update(ids)
+
+    def merge_names(self, other_info):
+        names = getattr(other_info, "names", None)
+        if names is None:
+            return
+        self.names.update(names)
 
     def merge_altitude(self, other_info):
         alti = getattr(other_info, "altitude", UNSPECIFIED_ALTITUDE)
@@ -628,8 +639,9 @@ class InfoWithIDsAndAltitude(object):
                 delta = abs(alti - self.altitude)
                 if delta > self.ALTITUDE_TOLERANCE:
                     raise InconsistentGeometricModel(
-                        "Intersecting constraints with different altitudes: {ids}",
-                        ids=sorted(self.ids))
+                        "Intersection de contraintes dont les altitudes sont differentes",
+                        ids=sorted(self.ids),
+                        names=sorted(self.names))
 
     def __repr__(self):
         args = ", ".join(["%s=%r" % kv for kv in self.__dict__.items()])
