@@ -149,7 +149,8 @@ def add_lake(ty_site, altimetry_site):
         allake = WaterBody(
             coords=points_to_coords(cylake.points),
             altitude=cylake.altitude,
-            id=cylake.elem_id)
+            id=cylake.elem_id,
+            name=cylake.name)
         altimetry_site.add_child(allake)
 
 
