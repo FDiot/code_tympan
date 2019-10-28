@@ -94,11 +94,13 @@ def build_sitenode(ty_site, mainsite=True, use_vol_landtakes=False):
                  RuntimeWarning)
             close_it = True
         lctype = SiteLandtake if mainsite else LevelCurve
+        cylcurve_name = "Emprise " + ty_site.name
         alcurve = lctype(
             coords=points_to_coords(cylcurve.points),
             altitude=cylcurve.altitude,
             close_it=close_it,
-            id=cylcurve.elem_id)
+            id=cylcurve.elem_id,
+            name=cylcurve_name)
         altimetry_site.add_child(alcurve)
 
     # Water bodies
