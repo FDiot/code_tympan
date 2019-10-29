@@ -145,9 +145,9 @@ class GeometricFeature(object):
         if shape.is_valid:
             return
         else:
-            raise InconsistentGeometricModel("Invalid shapely shape : {details}",
-                                             details=explain_validity(shape),
-                                             ids=[self.id])
+            msg = "Contour invalide :\nElement : {name} \nCause : {details}".format(
+                name=self.name, details=explain_validity(shape))
+            raise InconsistentGeometricModel(msg, ids=[self.id])
 
 
 def elementary_shapes(shape):
@@ -292,6 +292,7 @@ class SiteNode(PolygonalTympanFeature):
         for k in self.CHILDREN_TYPES:
             self.children[k] = []
         self.features_by_id = {}
+        self.ensure_ok()
 
     def add_child(self, child):
         self.children[child.tympan_type].append(child)
