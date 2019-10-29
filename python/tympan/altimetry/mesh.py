@@ -344,7 +344,8 @@ class MeshedCDTWithInfo(object):
             try:
                 d[v] = reduce(merge_function, info_list, info)
             except InconsistentGeometricModel as exc:
-                exc.witness_point = self.py_vertex(v)
+                exc.witness_point = (
+                    round(self.py_vertex(v)[0]), round(self.py_vertex(v)[1]))
                 exc.message = exc.message + "\nElements : {names} \nPoint d'intersection : {witness_point}".format(
                     names=exc.names,
                     witness_point=exc.witness_point)
