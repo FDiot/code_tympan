@@ -123,12 +123,14 @@ def build_sitenode(ty_site, mainsite=True, use_vol_landtakes=False):
             name=cylcurve.name)
         altimetry_site.add_child(alcurve)
 
-    if use_vol_landtakes:
-        # Ground contour (infrastructure landtake)
-        for id_, volume_contours in ty_site.ground_contour.items():
-            contours_coords = map(counter_clockwise_contours, volume_contours)
-            altimetry_site.add_child(
-                InfrastructureLandtake(*contours_coords, id=id_))
+    # Ground contour (infrastructure landtake)
+    for id_, volume_contours in ty_site.ground_contour.items():
+        contours_coords = map(counter_clockwise_contours, volume_contours)
+        # This is kept to make sure the object is correctly made, even when the
+        # landtake is not used
+        infra_landtake = InfrastructureLandtake(*contours_coords, id=id_)
+        if use_vol_landtakes:
+            altimetry_site.add_child(infra_landtake)
     # Recurse
     cysubsites = ty_site.subsites
     for cysbsite in cysubsites:

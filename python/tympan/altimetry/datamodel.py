@@ -278,6 +278,7 @@ class WaterBody(MaterialArea, LevelCurve):
     def __init__(self, coords, **kwargs):
         super(WaterBody, self).__init__(
             coords, material=MATERIAL_WATER, **kwargs)
+        self.ensure_ok()
 
 
 class SiteNode(PolygonalTympanFeature):
@@ -367,3 +368,12 @@ class InfrastructureLandtake(MaterialArea):
         shape = geometry.MultiPolygon(list(map(geometry.Polygon, coords)))
         super(InfrastructureLandtake, self).__init__(
             shape, material=HIDDEN_MATERIAL, **kwargs)
+        self.ensure_ok(coords)
+
+    def ensure_ok(self, coords):
+        for co in coords:
+            shape = geometry.Polygon(co)
+            if not shape.exterior.is_simple:
+                msg = "La forme du volume n'est pas correcte \nCoordonnees :{co} \nCause :{details}".format(
+                    co=co, details=explain_validity(shape))
+                raise InconsistentGeometricModel(msg, ids=[self.id])
