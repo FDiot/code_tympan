@@ -104,6 +104,9 @@ class SiteNodeGeometryCleaner(object):
     def feature_from_id(self, id):
         return self.equivalent_site.features_by_id[id]
 
+    def name_from_id(self, id):
+        return self.feature_from_id(id).name
+
     def merged_site(self):
         """Return the merged site"""
         merged_site = SiteNode(self.sitenode.build_coordinates()[0],
@@ -190,11 +193,18 @@ class SiteNodeGeometryCleaner(object):
         """
         for i, area_id in enumerate(self._sorted_material_areas):
             area_geom, area_info = self[area_id]
+            area_name = self.name_from_id(area_id)
             if inserted_area.shape.overlaps(area_geom):
-                msg = (
-                    "Partially overlapping material area in {subsite} between {ids} at positions {positions}")
-                raise InconsistentGeometricModel(msg, subsite=self.sitenode.id,
-                                                 ids=[area_id, inserted_area.id], positions=list(inserted_area.shape.intersection(area_geom).exterior.coords))
+                inserted_area_name = self.name_from_id(inserted_area.id)
+                positions = [(round(p[0]), round(p[1])) for p in inserted_area.shape.intersection(
+                    area_geom).exterior.coords]
+                msg = "Superposition de materiaux : \nSite : {subsite} \nMateriaux : {names} \nPositions : {positions}".format(
+                    subsite=self.sitenode.name,
+                    names=[area_name, inserted_area_name],
+                    positions=positions)
+
+                raise InconsistentGeometricModel(msg, ids=[area_id, inserted_area.id], names=[
+                                                 area_name, inserted_area_name])
             if inserted_area.shape.within(area_geom):
                 return i
         else:

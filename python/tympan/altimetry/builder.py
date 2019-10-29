@@ -85,7 +85,8 @@ def build_sitenode(ty_site, mainsite=True, use_vol_landtakes=False):
     # Site landtake
     (points, cylcurve) = ty_site.process_landtake()
     altimetry_site = SiteNode(coords=points_to_coords(points),
-                              id=ty_site.elem_id)
+                              id=ty_site.elem_id,
+                              name=ty_site.name)
     if cylcurve is not None:
         close_it = False
         if cylcurve.points[0] != cylcurve.points[-1]:
