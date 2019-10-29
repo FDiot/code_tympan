@@ -35,6 +35,7 @@ def recursively_merge_all_subsites(rootsite, allow_outside=True):
         subsites_to_be_processed.extend(current_site.subsites)
     return cleaned
 
+
 def build_site_shape_with_hole(site):
     site.ensure_ok()
     exterior = site.shape.exterior
@@ -86,8 +87,9 @@ class SiteNodeGeometryCleaner(object):
         self.ignored_features = []
         self.erroneous_overlap = []
         self._sorted_material_areas = []
-        self.equivalent_site = SiteNode(sitenode.build_coordinates()[0], id=None)
-        self.equivalent_site._cleaner = self # For tests.
+        self.equivalent_site = SiteNode(
+            sitenode.build_coordinates()[0], id=None)
+        self.equivalent_site._cleaner = self  # For tests.
 
     def _add_feature_with_new_shape(self, feature, shape):
         assert not isinstance(feature, SiteNode)
@@ -196,7 +198,8 @@ class SiteNodeGeometryCleaner(object):
             if inserted_area.shape.within(area_geom):
                 return i
         else:
-            # The inserted_area is disjoint with all others, insert it at the end
+            # The inserted_area is disjoint with all others, insert it at the
+            # end
             return len(self._sorted_material_areas)
 
     def _merge_subsite_materials(self, subcleaner):
@@ -207,15 +210,16 @@ class SiteNodeGeometryCleaner(object):
         # A site node is not a material area but has a geometry which
         # is enough to call insert_position_for_sorted_material_area to get the
         # place where to insert its own material
-        pos = self.insert_position_for_sorted_material_area(subcleaner.sitenode)
-        self._sorted_material_areas[pos:pos] = subcleaner.material_areas_inner_first()
-
+        pos = self.insert_position_for_sorted_material_area(
+            subcleaner.sitenode)
+        self._sorted_material_areas[
+            pos:pos] = subcleaner.material_areas_inner_first()
 
     def check_issues_with_material_area_order(self):
         """ Diagnostic helper: returns violation of the ordering for material area"""
         problems = set([])
         for i, area_i_id in enumerate(self._sorted_material_areas):
-            for j in range(i+1, len(self._sorted_material_areas)):
+            for j in range(i + 1, len(self._sorted_material_areas)):
                 area_j_id = self._sorted_material_areas[j]
                 area_i_geom = self.geom[area_i_id]
                 area_j_geom = self.geom[area_j_id]
