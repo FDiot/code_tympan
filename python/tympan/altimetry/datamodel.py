@@ -278,7 +278,6 @@ class WaterBody(MaterialArea, LevelCurve):
     def __init__(self, coords, **kwargs):
         super(WaterBody, self).__init__(
             coords, material=MATERIAL_WATER, **kwargs)
-        self.ensure_ok()
 
 
 class SiteNode(PolygonalTympanFeature):

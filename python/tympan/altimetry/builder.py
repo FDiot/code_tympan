@@ -180,7 +180,7 @@ def add_material(ty_site, altimetry_site, material_border_points, is_mainsite):
 
 
 # Altimetry mesh building utilities.
-def build_altimetry(mainsite, allow_features_outside_mainsite=True,
+def build_altimetry(mainsite, allow_features_outside_mainsite=False,
                     size_criterion=0.0, refine_mesh=True):
     """Return the results of altimetry building from a site tree model."""
     cleaner = recursively_merge_all_subsites(
