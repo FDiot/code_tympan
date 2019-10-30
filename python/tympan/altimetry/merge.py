@@ -25,8 +25,9 @@ def recursively_merge_all_subsites(rootsite, allow_outside=True):
                 # is by definition coincident with site geometry.
                 continue
             if not cleaned.siteshape.contains(feature.shape):
-                raise RuntimeError('%s is not strictly contained in main site' %
-                                   feature)
+                raise InconsistentGeometricModel(
+                    "L'élément : {name} n'est pas strictement contenu dans son site : {site} (attention un élément d'un site ne doit pas déborder sur son sous-site)".format(name=feature.name,
+                                                                                                                                                                             site=rootsite.name))
     cleaned.process_all_features()
     subsites_to_be_processed = list(rootsite.subsites)
     while subsites_to_be_processed:
@@ -123,6 +124,14 @@ class SiteNodeGeometryCleaner(object):
     def process_level_curves(self):
         for level_curve in self.sitenode.level_curves:
             shape = level_curve.shape.intersection(self.siteshape)
+            if self.siteshape.crosses(level_curve.shape):
+                raise InconsistentGeometricModel(
+                    "L'élément : {level_curve} n'est pas strictement contenu dans son site : {site} (attention un élément d'un site ne doit pas déborder sur son sous-site)".format(level_curve=level_curve.name,
+                                                                                                                                                                                    site=self.sitenode.name))
+            if self.siteshape.disjoint(level_curve.shape):
+                raise InconsistentGeometricModel(
+                    "L'élément : {level_curve} est entièrement en dehors de son site : {site} (attention un élément d'un site ne doit pas déborder sur son sous-site)".format(level_curve=level_curve.name,
+                                                                                                                                                                              site=self.sitenode.name))
             self._add_feature_with_new_shape(level_curve, shape)
 
     def _add_or_reject_polygonal_feature(self, feature):
@@ -135,10 +144,14 @@ class SiteNodeGeometryCleaner(object):
 
         if self.siteshape.overlaps(feature.shape):
             self.erroneous_overlap.append(feature.id)
-            return False
+            raise InconsistentGeometricModel(
+                "L'élément : {name} n'est pas strictement contenu dans son site : {site} (attention un élément d'un site ne doit pas dépasser sur son sous-site)".format(name=feature.name,
+                                                                                                                                                                         site=self.sitenode.name))
         if not self.siteshape.contains(feature.shape):
             self.ignored_features.append(feature.id)
-            return False
+            raise InconsistentGeometricModel(
+                "L'élément : {name} est entièrement en dehors de son site : {site} (attention un élément d'un site ne doit pas dépasser sur son sous-site)".format(name=feature.name,
+                                                                                                                                                                   site=self.sitenode.name))
         self._add_feature_with_new_shape(feature, feature.shape)
         return True
 
