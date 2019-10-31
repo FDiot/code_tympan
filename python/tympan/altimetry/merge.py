@@ -144,16 +144,14 @@ class SiteNodeGeometryCleaner(object):
 
         if self.siteshape.overlaps(feature.shape):
             self.erroneous_overlap.append(feature.id)
-            if isinstance(feature, WaterBody):
-                raise InconsistentGeometricModel(
-                    "L'élément : {name} n'est pas strictement contenu dans son site : {site} (attention un élément d'un site ne doit pas dépasser sur son sous-site)".format(name=feature.name,
-                                                                                                                                                                             site=self.sitenode.name))
-        if not self.siteshape.contains(feature.shape):
+            raise InconsistentGeometricModel(
+                "L'élément : {name} n'est pas strictement contenu dans son site : {site} (attention un élément d'un site ne doit pas dépasser sur son sous-site)".format(name=feature.name,
+                                                                                                                                                                         site=self.sitenode.name))
+        if self.siteshape.disjoint(feature.shape):
             self.ignored_features.append(feature.id)
-            if isinstance(feature, WaterBody):
-                raise InconsistentGeometricModel(
-                    "L'élément : {name} est entièrement en dehors de son site : {site} (attention un élément d'un site ne doit pas dépasser sur son sous-site)".format(name=feature.name,
-                                                                                                                                                                       site=self.sitenode.name))
+            raise InconsistentGeometricModel(
+                "L'élément : {name} est entièrement en dehors de son site : {site} (attention un élément d'un site ne doit pas dépasser sur son sous-site)".format(name=feature.name,
+                                                                                                                                                                   site=self.sitenode.name))
         self._add_feature_with_new_shape(feature, feature.shape)
         return True
 
@@ -227,7 +225,7 @@ class SiteNodeGeometryCleaner(object):
             area_geom, area_info = self[area_id]
             area_name = self.name_from_id(area_id)
             if inserted_area.shape.overlaps(area_geom):
-                inserted_area_name = self.name_from_id(inserted_area.id)
+                inserted_area_name = inserted_area.name
                 positions = [(round(p[0]), round(p[1])) for p in inserted_area.shape.intersection(
                     area_geom).exterior.coords]
                 msg = "Superposition de materiaux : \nSite : {subsite} \nMateriaux : {names} \nPositions : {positions}".format(
