@@ -11,7 +11,7 @@ from collections import defaultdict
 from copy import copy
 
 from shapely import geometry
-from . datamodel import SiteNode, InconsistentGeometricModel, SiteLandtake
+from . datamodel import SiteNode, InconsistentGeometricModel, SiteLandtake, WaterBody
 
 
 def recursively_merge_all_subsites(rootsite, allow_outside=True):
@@ -144,14 +144,16 @@ class SiteNodeGeometryCleaner(object):
 
         if self.siteshape.overlaps(feature.shape):
             self.erroneous_overlap.append(feature.id)
-            raise InconsistentGeometricModel(
-                "L'élément : {name} n'est pas strictement contenu dans son site : {site} (attention un élément d'un site ne doit pas dépasser sur son sous-site)".format(name=feature.name,
-                                                                                                                                                                         site=self.sitenode.name))
+            if isinstance(feature, WaterBody):
+                raise InconsistentGeometricModel(
+                    "L'élément : {name} n'est pas strictement contenu dans son site : {site} (attention un élément d'un site ne doit pas dépasser sur son sous-site)".format(name=feature.name,
+                                                                                                                                                                             site=self.sitenode.name))
         if not self.siteshape.contains(feature.shape):
             self.ignored_features.append(feature.id)
-            raise InconsistentGeometricModel(
-                "L'élément : {name} est entièrement en dehors de son site : {site} (attention un élément d'un site ne doit pas dépasser sur son sous-site)".format(name=feature.name,
-                                                                                                                                                                   site=self.sitenode.name))
+            if isinstance(feature, WaterBody):
+                raise InconsistentGeometricModel(
+                    "L'élément : {name} est entièrement en dehors de son site : {site} (attention un élément d'un site ne doit pas dépasser sur son sous-site)".format(name=feature.name,
+                                                                                                                                                                       site=self.sitenode.name))
         self._add_feature_with_new_shape(feature, feature.shape)
         return True
 
