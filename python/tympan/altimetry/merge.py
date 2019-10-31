@@ -9,6 +9,7 @@ of all the site note of a compound site to build a single site.
 
 from collections import defaultdict
 from copy import copy
+from itertools import combinations
 
 from shapely import geometry
 from . datamodel import SiteNode, InconsistentGeometricModel, SiteLandtake, WaterBody
@@ -44,10 +45,9 @@ def build_site_shape_with_hole(site):
         raise ValueError("The site is not expected to already have holes")
     for hole in site.subsites:
         if not site.shape.contains(hole.shape):
-            raise RuntimeError('%s is not strictly contained in main site' %
-                               hole)
-    holes = [hole.shape.exterior
-             for hole in site.subsites]
+            raise InconsistentGeometricModel(
+                "{name} n'est pas strictement contenu dans {parent}".format(name=hole.name, parent=site.name))
+    holes = [hole.shape.exterior for hole in site.subsites]
     return geometry.Polygon(exterior, holes)
 
 
@@ -167,7 +167,24 @@ class SiteNodeGeometryCleaner(object):
         for landtake in self.sitenode.landtakes:
             self._add_or_reject_polygonal_feature(landtake)
 
+    def process_subsites_landtakes(self):
+        for subsite in self.sitenode.subsites:
+            if self.sitenode.shape.crosses(subsite.shape):
+                raise InconsistentGeometricModel(
+                    "{site} n'est pas strictement contenu dans {parent}".format(site=subsite.name, parent=self.sitenode.name))
+            if self.sitenode.shape.disjoint(subsite.shape):
+                raise InconsistentGeometricModel(
+                    "{site} est entièrement en dehors de {parent}".format(site=subsite.name, parent=self.sitenode.name))
+
+        for subsite1, subsite2 in combinations(self.sitenode.subsites, 2):
+            if subsite1.shape.overlaps(subsite2.shape):
+                raise InconsistentGeometricModel(
+                    "Les deux sites {site1} et {site2} appartenant au site {parent} se superposent".format(site1=subsite1.name,
+                                                                                                           site2=subsite2.name,
+                                                                                                           parent=self.sitenode.name))
+
     def process_all_features(self):
+        self.process_subsites_landtakes()
         self.process_level_curves()
         self.process_material_areas()
         self.process_infrastructure_landtakes()
@@ -189,7 +206,7 @@ class SiteNodeGeometryCleaner(object):
         subcleaner.process_all_features()
         if subcleaner.erroneous_overlap:
             msg = ("Can not merge subsite {subsite} because of features {ids} "
-                   "overlapping its boundaries.")
+                   "overlapping its boundaries.").format(subsite=subsite.name, ids=subcleaner.erroneous_overlap)
             raise InconsistentGeometricModel(msg, subsite=subsite.id,
                                              ids=subcleaner.erroneous_overlap)
         self.import_cleaned_geometries_from(subcleaner)
