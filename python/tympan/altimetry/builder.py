@@ -69,11 +69,13 @@ def build_material_area(ty_materialarea, altimetry_groundmaterial, landtake_poin
     if ty_materialarea.points:
         return cls(coords=points_to_coords(ty_materialarea.points),
                    material=altimetry_groundmaterial,
-                   id=ty_materialarea.elem_id, **kwargs)
+                   id=ty_materialarea.elem_id,
+                   name=ty_materialarea.name, **kwargs)
     else:
         return cls(coords=points_to_coords(landtake_points_for_subsites),
                    material=altimetry_groundmaterial,
-                   id=ty_materialarea.elem_id, **kwargs)
+                   id=ty_materialarea.elem_id,
+                   name=ty_materialarea.name, **kwargs)
 
 
 def build_sitenode(ty_site, mainsite=True, use_vol_landtakes=False):
